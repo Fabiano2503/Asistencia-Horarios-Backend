@@ -16,12 +16,9 @@ class PracticanteViewSet(viewsets.ModelViewSet):
         correo = self.request.query_params.get('correo')
         estado = self.request.query_params.get('estado')
 
-        if not nombre and not correo and not estado:
-            return self.practicante_service.get_all_practicantes()
-
         return self.practicante_service.filter_practicantes(nombre, correo, estado)
 
-    # Retrieve, List, Create, Update, Delete actions
+    # Create, Retrieve, List, Update, Delete actions
     def retrieve(self, request, *args, **kwargs):
         instance = self.practicante_service.get_practicante_by_id(kwargs.get('pk'))
         if not instance:
@@ -31,6 +28,10 @@ class PracticanteViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -45,6 +46,8 @@ class PracticanteViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.practicante_service.get_practicante_by_id(kwargs.get('pk'))
+        if not instance:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         practicante = self.practicante_service.update_practicante(kwargs.get('pk'), serializer.validated_data)
