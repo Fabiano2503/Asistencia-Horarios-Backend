@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
-from .models import Practicante
+from apps.practicantes.domain.practicante import Practicante
 
 # Repositorio abstracto para el modelo Practicante
 class PracticanteRepository(ABC):
@@ -26,9 +26,9 @@ class PracticanteRepository(ABC):
         pass
 
     @abstractmethod
-    def filter(self, nombre: str = None, correo: str = None, estado: str = None) -> List[Practicante]:
+    def filter(self, nombre: Optional[str] = None, correo: Optional[str] = None, estado: Optional[str] = None) -> List[Practicante]:
         pass
 
     @abstractmethod
-    def get_stats(self) -> dict:
+    def get_stats(self) -> dict[str, int]:
         pass

@@ -3,63 +3,82 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from .serializers import PracticanteSerializer, EstadisticasSerializer
 from ..application.services import PracticanteService
-from .repositories import DjangoPracticanteRepository
+from .django_orm_repository import DjangoPracticanteRepository
 
-# ViewSet para el manejo de Practicantes
-class PracticanteViewSet(viewsets.ModelViewSet):
+# ViewSet para gestionar las operaciones CRUD y estadísticas de practicantes
+class PracticanteViewSet(viewsets.GenericViewSet):
     serializer_class = PracticanteSerializer
-    practicante_service = PracticanteService(DjangoPracticanteRepository())
 
-    # Obtener el queryset basado en filtros de consulta
-    def get_queryset(self):
-        nombre = self.request.query_params.get('nombre')
-        correo = self.request.query_params.get('correo')
-        estado = self.request.query_params.get('estado')
+    def get_service(self) -> PracticanteService:
+        return PracticanteService(DjangoPracticanteRepository())
 
-        return self.practicante_service.filter_practicantes(nombre, correo, estado)
-
-    # Create, Retrieve, List, Update, Delete actions
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.practicante_service.get_practicante_by_id(kwargs.get('pk'))
-        if not instance:
-            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
-
+    # Listado con filtros y paginación
     def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        page = self.paginate_queryset(queryset)
+        service = self.get_service()
+        nombre = request.query_params.get('nombre')
+        correo = request.query_params.get('correo')
+        estado = request.query_params.get('estado')
+
+        practicantes = service.filter_practicantes(nombre, correo, estado)
+
+        page = self.paginate_queryset(practicantes)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
-        serializer = self.get_serializer(queryset, many=True)
+
+        serializer = self.get_serializer(practicantes, many=True)
         return Response(serializer.data)
 
-    def create(self, request, *args, **kwargs):
+    # Obtener un solo practicante
+    def retrieve(self, request, pk=None):
+        service = self.get_service()
+        practicante = service.get_practicante_by_id(pk)
+        if not practicante:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = self.get_serializer(practicante)
+        return Response(serializer.data)
+
+    # Crear un practicante
+    def create(self, request):
+        service = self.get_service()
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        practicante = self.practicante_service.create_practicante(serializer.validated_data)
+        practicante = service.create_practicante(serializer.validated_data)
         serializer = self.get_serializer(practicante)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
-        instance = self.practicante_service.get_practicante_by_id(kwargs.get('pk'))
-        if not instance:
-            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+    # Actualizar un practicante
+    def update(self, request, pk=None):
+        service = self.get_service()
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        practicante = self.practicante_service.update_practicante(kwargs.get('pk'), serializer.validated_data)
-        return Response(self.get_serializer(practicante).data)
+        practicante = service.update_practicante(pk, serializer.validated_data)
+        if not practicante:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = self.get_serializer(practicante)
+        return Response(serializer.data)
 
-    def destroy(self, request, *args, **kwargs):
-        self.practicante_service.delete_practicante(kwargs.get('pk'))
+    # Actualización parcial (PATCH)
+    def partial_update(self, request, pk=None):
+        service = self.get_service()
+        serializer = self.get_serializer(data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        practicante = service.update_practicante(pk, serializer.validated_data)
+        if not practicante:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = self.get_serializer(practicante)
+        return Response(serializer.data)
+
+    # Eliminar un practicante
+    def destroy(self, request, pk=None):
+        service = self.get_service()
+        service.delete_practicante(pk)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    # Acción personalizada para obtener estadísticas de practicantes
+    # Acción personalizada para estadísticas
     @action(detail=False, methods=['get'])
     def estadisticas(self, request):
-        stats = self.practicante_service.get_practicante_stats()
+        service = self.get_service()
+        stats = service.get_practicante_stats()
         serializer = EstadisticasSerializer(stats)
         return Response(serializer.data)
