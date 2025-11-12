@@ -1,8 +1,10 @@
 from typing import List, Optional
 from django.db.models import Q
 from apps.practicantes.domain.practicante import Practicante, EstadoPracticante
-from apps.practicantes.domain.repositories import PracticanteRepository
+from apps.practicantes.domain.repositories import PracticanteRepository,  ReforzamientoRepository
+from apps.practicantes.domain.reforzamiento import PracticanteReforzamiento as ReforzamientoDomain, EstadoReforzamiento  
 from apps.practicantes.infrastructure.models import Practicante as PracticanteModel
+from .models import Practicante as PracticanteModel, PracticanteReforzamiento as ReforzamientoModel  
 
 # Implementación del repositorio utilizando Django ORM
 class DjangoPracticanteRepository(PracticanteRepository):
@@ -77,4 +79,92 @@ class DjangoPracticanteRepository(PracticanteRepository):
             "activos": activos,
             "en_recuperacion": en_recuperacion,
             "en_riesgo": en_riesgo
+        }
+
+# Implementación del repositorio de Reforzamiento usando Django ORM
+class DjangoReforzamientoRepository(ReforzamientoRepository):
+
+    def _to_domain(self, model: ReforzamientoModel) -> ReforzamientoDomain:
+        return ReforzamientoDomain(
+            id=model.id,
+            practicante_id=model.practicante_id,
+            nombre_completo=model.nombre_completo,
+            area=model.area,
+            motivo=model.motivo,
+            fecha_ingreso=model.fecha_ingreso,
+            estado=EstadoReforzamiento(model.estado)
+        )
+
+    def _to_model(self, domain: ReforzamientoDomain) -> ReforzamientoModel:
+        if domain.id:
+            model = ReforzamientoModel.objects.get(id=domain.id)
+            model.practicante_id = domain.practicante_id
+            model.nombre_completo = domain.nombre_completo
+            model.area = domain.area
+            model.motivo = domain.motivo
+            model.fecha_ingreso = domain.fecha_ingreso
+            model.estado = domain.estado.value
+        else:
+            model = ReforzamientoModel(
+                practicante_id=domain.practicante_id,
+                nombre_completo=domain.nombre_completo,
+                area=domain.area,
+                motivo=domain.motivo,
+                fecha_ingreso=domain.fecha_ingreso,
+                estado=domain.estado.value
+            )
+        return model
+
+    def get_all(self) -> List[ReforzamientoDomain]:
+        models = ReforzamientoModel.objects.all()
+        return [self._to_domain(model) for model in models]
+
+    def get_by_id(self, reforzamiento_id: int) -> Optional[ReforzamientoDomain]:
+        try:
+            model = ReforzamientoModel.objects.get(id=reforzamiento_id)
+            return self._to_domain(model)
+        except ReforzamientoModel.DoesNotExist:
+            return None
+
+    def get_by_practicante_id(self, practicante_id: int) -> Optional[ReforzamientoDomain]:
+        try:
+            model = ReforzamientoModel.objects.filter(practicante_id=practicante_id).first()
+            return self._to_domain(model) if model else None
+        except ReforzamientoModel.DoesNotExist:
+            return None
+
+    def create(self, reforzamiento: ReforzamientoDomain) -> ReforzamientoDomain:
+        model = self._to_model(reforzamiento)
+        model.save()
+        return self._to_domain(model)
+
+    def update(self, reforzamiento: ReforzamientoDomain) -> ReforzamientoDomain:
+        model = self._to_model(reforzamiento)
+        model.save()
+        return self._to_domain(model)
+
+    def delete(self, reforzamiento_id: int) -> None:
+        ReforzamientoModel.objects.filter(id=reforzamiento_id).delete()
+
+    def filter_by_estado(self, estado: str) -> List[ReforzamientoDomain]:
+        models = ReforzamientoModel.objects.filter(estado=estado)
+        return [self._to_domain(model) for model in models]
+
+    def get_metricas(self) -> dict:
+        en_reforzamiento = ReforzamientoModel.objects.filter(
+            estado=ReforzamientoModel.Estado.EN_REFORZAMIENTO
+        ).count()
+        
+        completados = ReforzamientoModel.objects.filter(
+            estado=ReforzamientoModel.Estado.COMPLETADO
+        ).count()
+        
+        reintegrados = ReforzamientoModel.objects.filter(
+            estado=ReforzamientoModel.Estado.REINTEGRADO
+        ).count()
+        
+        return {
+            'en_reforzamiento': en_reforzamiento,
+            'completados': completados,
+            'reintegrados': reintegrados
         }

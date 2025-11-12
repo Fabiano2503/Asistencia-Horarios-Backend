@@ -21,3 +21,34 @@ class Practicante(models.Model):
 
     def __str__(self):
         return f'{self.nombre} {self.apellido}'
+
+# Modelo para practicantes en reforzamiento
+class PracticanteReforzamiento(models.Model):
+    class Estado(models.TextChoices):
+        EN_REFORZAMIENTO = 'en_reforzamiento', 'En Reforzamiento'
+        COMPLETADO = 'completado', 'Completado'
+        REINTEGRADO = 'reintegrado', 'Reintegrado'
+
+    practicante = models.ForeignKey(
+        Practicante,
+        on_delete=models.CASCADE,
+        related_name='reforzamientos'
+    )
+    nombre_completo = models.CharField(max_length=200)
+    area = models.CharField(max_length=100, default="Falta agregar")
+    motivo = models.TextField(default="Falta agregar")
+    fecha_ingreso = models.DateTimeField(auto_now_add=True)
+    estado = models.CharField(
+        max_length=20,
+        choices=Estado.choices,
+        default=Estado.EN_REFORZAMIENTO
+    )
+
+    class Meta:
+        db_table = 'practicantes_reforzamiento'
+        verbose_name = 'Practicante en Reforzamiento'
+        verbose_name_plural = 'Practicantes en Reforzamiento'
+        ordering = ['-fecha_ingreso']
+
+    def __str__(self):
+        return f'{self.nombre_completo} - {self.area}'
