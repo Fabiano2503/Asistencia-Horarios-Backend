@@ -16,7 +16,10 @@ class PracticanteViewSet(viewsets.GenericViewSet):
     serializer_class = PracticanteSerializer
 
     def get_service(self) -> PracticanteService:
-        return PracticanteService(DjangoPracticanteRepository())
+        return PracticanteService(
+            DjangoPracticanteRepository(),
+            DjangoReforzamientoRepository()
+        )
 
     # Listado con filtros y paginación
     def list(self, request, *args, **kwargs):

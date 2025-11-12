@@ -1,0 +1,448 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "Reforzamiento API - Practicantes",
+		"description": "Colección completa para probar los endpoints de Practicantes y Reforzamiento",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Practicantes",
+			"item": [
+				{
+					"name": "Listar Practicantes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/practicantes/",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "practicantes", ""]
+						}
+					}
+				},
+				{
+					"name": "Crear Practicante",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id_discord\": 123456789,\n    \"nombre\": \"Juan\",\n    \"apellido\": \"Pérez\",\n    \"correo\": \"juan.perez@example.com\",\n    \"semestre\": 3,\n    \"estado\": \"activo\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/practicantes/",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "practicantes", ""]
+						}
+					}
+				},
+				{
+					"name": "Ver Practicante por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/practicantes/1/",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "practicantes", "1", ""]
+						}
+					}
+				},
+				{
+					"name": "Actualizar Practicante (Estado a Recuperación)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"estado\": \"en_recuperacion\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/practicantes/1/",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "practicantes", "1", ""]
+						}
+					}
+				},
+				{
+					"name": "Filtrar Practicantes por Estado",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/practicantes/?estado=en_recuperacion",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "practicantes", ""],
+							"query": [
+								{
+									"key": "estado",
+									"value": "en_recuperacion"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Estadísticas de Practicantes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/practicantes/estadisticas/",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "practicantes", "estadisticas", ""]
+						}
+					}
+				},
+				{
+					"name": "Eliminar Practicante",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/practicantes/1/",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "practicantes", "1", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Reforzamiento",
+			"item": [
+				{
+					"name": "Listar Todos los Reforzamientos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/reforzamiento/",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "reforzamiento", ""]
+						}
+					}
+				},
+				{
+					"name": "Crear Reforzamiento desde Practicante",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"practicante_id\": 1\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/reforzamiento/",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "reforzamiento", ""]
+						}
+					}
+				},
+				{
+					"name": "Ver Reforzamiento por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/reforzamiento/1/",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "reforzamiento", "1", ""]
+						}
+					}
+				},
+				{
+					"name": "Actualizar Área y Motivo",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"area\": \"Desarrollo\",\n    \"motivo\": \"3 advertencias por faltas injustificadas\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/reforzamiento/1/actualizar_info/",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "reforzamiento", "1", "actualizar_info", ""]
+						}
+					}
+				},
+				{
+					"name": "Marcar como Completado",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/reforzamiento/1/completar/",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "reforzamiento", "1", "completar", ""]
+						}
+					}
+				},
+				{
+					"name": "Marcar como Reintegrado",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/reforzamiento/1/reintegrar/",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "reforzamiento", "1", "reintegrar", ""]
+						}
+					}
+				},
+				{
+					"name": "Filtrar por Estado - En Reforzamiento",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/reforzamiento/?estado=en_reforzamiento",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "reforzamiento", ""],
+							"query": [
+								{
+									"key": "estado",
+									"value": "en_reforzamiento"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Filtrar por Estado - Completados",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/reforzamiento/?estado=completado",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "reforzamiento", ""],
+							"query": [
+								{
+									"key": "estado",
+									"value": "completado"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Filtrar por Estado - Reintegrados",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/reforzamiento/?estado=reintegrado",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "reforzamiento", ""],
+							"query": [
+								{
+									"key": "estado",
+									"value": "reintegrado"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Métricas de Reforzamiento",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/reforzamiento/metricas/",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "reforzamiento", "metricas", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Flujo Completo de Prueba (AUTOMÁTICO)",
+			"item": [
+				{
+					"name": "1. Crear Practicante María López",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id_discord\": 987654321,\n    \"nombre\": \"María\",\n    \"apellido\": \"López\",\n    \"correo\": \"maria.lopez@example.com\",\n    \"semestre\": 4,\n    \"estado\": \"activo\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/practicantes/",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "practicantes", ""]
+						}
+					}
+				},
+				{
+					"name": "2. Cambiar Estado a Recuperación (Crea Reforzamiento AUTO)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"estado\": \"en_recuperacion\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/practicantes/2/",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "practicantes", "2", ""]
+						}
+					}
+				},
+				{
+					"name": "3. Verificar que se Creó el Reforzamiento",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/reforzamiento/",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "reforzamiento", ""]
+						}
+					}
+				},
+				{
+					"name": "4. Actualizar Área y Motivo",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"area\": \"Marketing\",\n    \"motivo\": \"Bajo rendimiento en horas trabajadas (menos de 20h semanales)\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/reforzamiento/1/actualizar_info/",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "reforzamiento", "1", "actualizar_info", ""]
+						}
+					}
+				},
+				{
+					"name": "5. Ver Métricas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/reforzamiento/metricas/",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "reforzamiento", "metricas", ""]
+						}
+					}
+				},
+				{
+					"name": "6. Marcar como Completado",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/reforzamiento/1/completar/",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "reforzamiento", "1", "completar", ""]
+						}
+					}
+				},
+				{
+					"name": "7. Ver Métricas Actualizadas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/reforzamiento/metricas/",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8000",
+							"path": ["api", "reforzamiento", "metricas", ""]
+						}
+					}
+				}
+			]
+		}
+	]
+}

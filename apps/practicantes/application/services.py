@@ -7,8 +7,9 @@ from apps.practicantes.domain.reforzamiento import PracticanteReforzamiento, Est
 # Clase de servicio para gestionar la lógica de negocio relacionada con los practicantes
 class PracticanteService:
 
-    def __init__(self, practicante_repository: PracticanteRepository):
+    def __init__(self, practicante_repository: PracticanteRepository, reforzamiento_repository: ReforzamientoRepository = None):
         self.practicante_repository = practicante_repository
+        self.reforzamiento_repository = reforzamiento_repository
 
     def get_all_practicantes(self) -> List[Practicante]:
         return self.practicante_repository.get_all()
@@ -23,12 +24,38 @@ class PracticanteService:
     def update_practicante(self, practicante_id: int, practicante_data: dict) -> Optional[Practicante]:
         practicante = self.get_practicante_by_id(practicante_id)
         if practicante:
+            # Guardar el estado anterior
+            estado_anterior = practicante.estado
+            
             for key, value in practicante_data.items():
                 if key == 'estado':
                     setattr(practicante, key, EstadoPracticante(value))
                 else:
                     setattr(practicante, key, value)
-            return self.practicante_repository.update(practicante)
+            
+            practicante_actualizado = self.practicante_repository.update(practicante)
+            
+            # NUEVO: Si cambió a estado EN_RECUPERACION, crear automáticamente el reforzamiento
+            if (estado_anterior != EstadoPracticante.EN_RECUPERACION and 
+                practicante_actualizado.estado == EstadoPracticante.EN_RECUPERACION and
+                self.reforzamiento_repository is not None):
+                
+                # Verificar si ya existe un registro de reforzamiento
+                reforzamiento_existente = self.reforzamiento_repository.get_by_practicante_id(practicante_id)
+                
+                if not reforzamiento_existente:
+                    # Crear automáticamente el registro de reforzamiento
+                    reforzamiento = PracticanteReforzamiento(
+                        practicante_id=practicante_actualizado.id,
+                        nombre_completo=practicante_actualizado.nombre_completo,
+                        area="Falta agregar",
+                        motivo="Falta agregar",
+                        fecha_ingreso=datetime.now(),
+                        estado=EstadoReforzamiento.EN_REFORZAMIENTO
+                    )
+                    self.reforzamiento_repository.create(reforzamiento)
+            
+            return practicante_actualizado
         return None
 
     def delete_practicante(self, practicante_id: int) -> None:
@@ -39,6 +66,7 @@ class PracticanteService:
 
     def get_practicante_stats(self) -> dict[str, int]:
         return self.practicante_repository.get_stats()
+
 
 # Servicio de aplicación para reforzamiento
 class ReforzamientoService:
