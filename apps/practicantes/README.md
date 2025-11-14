@@ -117,3 +117,122 @@ Este módulo gestiona la información de los practicantes.
     "en_riesgo": 0
   }
   ```
+
+## Reforzamiento
+
+### Listar y Filtrar Reforzamientos
+
+- **GET /api/reforzamiento/**
+- **Query Params:**
+  - `practicante` (integer): Filtra por ID del practicante.
+  - `fecha_inicio` (date): Filtra por fecha de inicio.
+  - `fecha_fin` (date): Filtra por fecha de fin.
+  - `estado` (string): Filtra por estado (`pendiente`, `en_progreso`, `completado`).
+- **Respuesta:**
+  ```json
+  {
+    "count": 50,
+    "next": "https://IP:PUERTO/api/reforzamiento/?page=2",
+    "previous": null,
+    "results": [
+      {
+        "id": 1,
+        "practicante": 1,
+        "fecha_inicio": "2025-01-15",
+        "fecha_fin": "2025-02-15",
+        "descripcion": "Reforzamiento en Python",
+        "estado": "en_progreso"
+      },
+      {
+        "id": 2,
+        "practicante": 5,
+        "fecha_inicio": "2025-01-10",
+        "fecha_fin": "2025-02-10",
+        "descripcion": "Reforzamiento en Django",
+        "estado": "pendiente"
+      }
+    ]
+  }
+  ```
+
+### Obtener Detalle de un Reforzamiento
+
+- **GET /api/reforzamiento/{id}/**
+
+### Crear un Reforzamiento
+
+- **POST /api/reforzamiento/**
+- **Body:**
+  ```json
+  {
+    "practicante": 1,
+    "fecha_inicio": "2025-01-15",
+    "fecha_fin": "2025-02-15",
+    "descripcion": "Reforzamiento en Python",
+    "estado": "pendiente"
+  }
+  ```
+
+### Actualizar un Reforzamiento
+
+- **PUT /api/reforzamiento/{id}/**
+- **PATCH /api/reforzamiento/{id}/**
+- **Body:** (similar al de creación)
+
+### Eliminar un Reforzamiento
+
+- **DELETE /api/reforzamiento/{id}/**
+
+### Actualizar Área y Motivo de Reforzamiento
+
+- **PATCH /api/reforzamiento/{id}/actualizar_info/**
+- **Body:**
+  ```json
+  {
+    "area": "Backend",
+    "motivo": "Dificultades con Django ORM"
+  }
+  ```
+
+### Completar Reforzamiento
+
+- **POST /api/reforzamiento/{id}/completar/**
+- **Respuesta:**
+  ```json
+  {
+    "id": 1,
+    "practicante": 1,
+    "fecha_inicio": "2025-01-15",
+    "fecha_fin": "2025-02-15",
+    "descripcion": "Reforzamiento en Python",
+    "estado": "completado"
+  }
+  ```
+
+### Reintegrar Practicante
+
+- **POST /api/reforzamiento/{id}/reintegrar/**
+- **Respuesta:**
+  ```json
+  {
+    "id": 1,
+    "practicante": 1,
+    "fecha_inicio": "2025-01-15",
+    "fecha_fin": "2025-02-15",
+    "descripcion": "Reforzamiento en Python",
+    "estado": "reintegrado"
+  }
+  ```
+
+### Obtener Métricas de Reforzamiento
+
+- **GET /api/reforzamiento/metricas/**
+- **Respuesta:**
+  ```json
+  {
+    "en_reforzamiento": 0,
+    "completados": 0,
+    "reintegrados": 0,
+    "total": 0
+  }
+  ```
