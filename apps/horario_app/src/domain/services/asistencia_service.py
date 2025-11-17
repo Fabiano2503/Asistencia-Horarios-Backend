@@ -13,5 +13,4 @@ class AsistenciaService:
             return "pendiente"
         except:
             return "pendiente"
-
         
