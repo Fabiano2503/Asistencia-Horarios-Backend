@@ -19,5 +19,10 @@ class Practicante(models.Model):
         default=Estado.ACTIVO
     )
 
+    class Meta:
+        db_table = "practicante"
+        verbose_name = "Practicante"
+        verbose_name_plural = "Practicantes"
+
     def __str__(self):
         return f'{self.nombre} {self.apellido}'
