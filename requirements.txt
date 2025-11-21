@@ -3,4 +3,5 @@ channels_redis==4.3.0
 daphne==4.2.1
 Django==5.2.8
 djangorestframework==3.16.1
+django-cors-headers==4.9.0
 redis==7.0.1

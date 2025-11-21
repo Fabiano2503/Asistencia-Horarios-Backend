@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-h!vk8ov0i0davsy)pygdi53w$tjx65e!ejz49tc9ypzw0hkc)k
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [ '*' ] # Ajuste temporal para permitir todas las conexiones
 
 
 # Application definition
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'channels',
+    'corsheaders',
     'apps.practicantes',
     'apps.bot_discord',
 ]
@@ -47,6 +48,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -75,11 +77,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 ASGI_APPLICATION = 'config.asgi.application'
 CHANNEL_LAYERS = {
     'default': {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",
-        # 'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        # 'CONFIG': {
-        #     "hosts": [('127.0.0.1', 6379)],
-        # },
+        # "BACKEND": "channels.layers.InMemoryChannelLayer", # Para desarrollo local sin Redis
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',  # Usar Redis en producción
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
     },
 }
 
@@ -91,6 +93,14 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+
+        # Configuración para MySQL
+        # 'ENGINE': 'django.db.backends.mysql',
+        # 'NAME': 'bot_asistencia',
+        # 'USER': 'root',
+        # 'PASSWORD': 'root',
+        # 'HOST': 'localhost',
+        # 'PORT': '3306',
     }
 }
 
@@ -143,3 +153,7 @@ REST_FRAMEWORK = {
 
 # Bot Discord API Key
 BOT_API_KEY = "UiginLanLajNYYGwbcH_FeXmFajdhAUDGadjuai9Q"
+
+# CORS Configuration
+CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOWED_ORIGINS = [""] # Ajustar según sea necesario en producción
