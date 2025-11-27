@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Endpoints - Sistema de Puntualidad</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        
+        .endpoint {
+            background: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s;
+        }
+        
+        .endpoint:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .method {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 12px;
+            min-width: 60px;
+            text-align: center;
+        }
+        
+        .method.get {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .method.post {
+            background: #2196f3;
+            color: white;
+        }
+        
+        .method.put {
+            background: #ff9800;
+            color: white;
+        }
+        
+        .method.delete {
+            background: #f44336;
+            color: white;
+        }
+        
+        .url {
+            flex: 1;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #333;
+            word-break: break-all;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-test {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-test:hover {
+            background: #5568d3;
+        }
+        
+        .btn-open {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .btn-open:hover {
+            background: #45a049;
+        }
+        
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 6px;
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+        }
+        
+        .result.success {
+            background: #e8f5e9;
+            border: 1px solid #4caf50;
+            color: #2e7d32;
+        }
+        
+        .result.error {
+            background: #ffebee;
+            border: 1px solid #f44336;
+            color: #c62828;
+        }
+        
+        .result pre {
+            margin-top: 10px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 12px;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .status.success {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .status.error {
+            background: #f44336;
+            color: white;
+        }
+        
+        .input-group {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .input-group input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+            flex: 1;
+        }
+        
+        .input-group label {
+            font-size: 12px;
+            color: #666;
+            min-width: 80px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 Test de Endpoints</h1>
+        <p class="subtitle">Sistema de Asistencia y Horarios - Base URL: http://127.0.0.1:8000</p>
+        
+        <div class="section">
+            <h2>🏠 Página Principal</h2>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">http://127.0.0.1:8000/</span>
+                <div class="actions">
+                    <button class="btn-test" onclick="testEndpoint('GET', 'http://127.0.0.1:8000/')">Test</button>
+                    <button class="btn-open" onclick="window.open('http://127.0.0.1:8000/')">Abrir</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>📊 Puntualidad - GET</h2>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">http://127.0.0.1:8000/api/puntualidad/resumen/</span>
+                <div class="actions">
+                    <button class="btn-test" onclick="testEndpoint('GET', 'http://127.0.0.1:8000/api/puntualidad/resumen/')">Test</button>
+                    <button class="btn-open" onclick="window.open('http://127.0.0.1:8000/api/puntualidad/resumen/')">Abrir</button>
+                </div>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">http://127.0.0.1:8000/api/puntualidad/alertas/</span>
+                <div class="actions">
+                    <button class="btn-test" onclick="testEndpoint('GET', 'http://127.0.0.1:8000/api/puntualidad/alertas/')">Test</button>
+                    <button class="btn-open" onclick="window.open('http://127.0.0.1:8000/api/puntualidad/alertas/')">Abrir</button>
+                </div>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">http://127.0.0.1:8000/api/puntualidad/practicantes/</span>
+                <div class="actions">
+                    <button class="btn-test" onclick="testEndpoint('GET', 'http://127.0.0.1:8000/api/puntualidad/practicantes/')">Test</button>
+                    <button class="btn-open" onclick="window.open('http://127.0.0.1:8000/api/puntualidad/practicantes/')">Abrir</button>
+                </div>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">http://127.0.0.1:8000/api/puntualidad/practicantes/activos/</span>
+                <div class="actions">
+                    <button class="btn-test" onclick="testEndpoint('GET', 'http://127.0.0.1:8000/api/puntualidad/practicantes/activos/')">Test</button>
+                    <button class="btn-open" onclick="window.open('http://127.0.0.1:8000/api/puntualidad/practicantes/activos/')">Abrir</button>
+                </div>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">http://127.0.0.1:8000/api/puntualidad/justificaciones/</span>
+                <div class="actions">
+                    <button class="btn-test" onclick="testEndpoint('GET', 'http://127.0.0.1:8000/api/puntualidad/justificaciones/')">Test</button>
+                    <button class="btn-open" onclick="window.open('http://127.0.0.1:8000/api/puntualidad/justificaciones/')">Abrir</button>
+                </div>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">http://127.0.0.1:8000/api/puntualidad/recuperaciones/</span>
+                <div class="actions">
+                    <button class="btn-test" onclick="testEndpoint('GET', 'http://127.0.0.1:8000/api/puntualidad/recuperaciones/')">Test</button>
+                    <button class="btn-open" onclick="window.open('http://127.0.0.1:8000/api/puntualidad/recuperaciones/')">Abrir</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>📝 Puntualidad - POST</h2>
+            
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="url">http://127.0.0.1:8000/api/puntualidad/justificaciones/crear/</span>
+                <div class="actions">
+                    <button class="btn-test" onclick="testCreateJustificacion()">Test</button>
+                </div>
+                <div class="input-group">
+                    <label>Practicante ID:</label>
+                    <input type="number" id="practicante_id" value="1" placeholder="1">
+                    <label>Fecha:</label>
+                    <input type="date" id="fecha" value="">
+                    <label>Motivo:</label>
+                    <input type="text" id="motivo" value="Test desde HTML" placeholder="Motivo">
+                </div>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="url">http://127.0.0.1:8000/api/puntualidad/justificaciones/{id}/aprobar/</span>
+                <div class="actions">
+                    <button class="btn-test" onclick="testAprobarJustificacion()">Test</button>
+                </div>
+                <div class="input-group">
+                    <label>Justificación ID:</label>
+                    <input type="number" id="justificacion_id_aprobar" value="1" placeholder="1">
+                </div>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="url">http://127.0.0.1:8000/api/puntualidad/justificaciones/{id}/rechazar/</span>
+                <div class="actions">
+                    <button class="btn-test" onclick="testRechazarJustificacion()">Test</button>
+                </div>
+                <div class="input-group">
+                    <label>Justificación ID:</label>
+                    <input type="number" id="justificacion_id_rechazar" value="1" placeholder="1">
+                    <label>Motivo Rechazo:</label>
+                    <input type="text" id="motivo_rechazo" value="Test de rechazo" placeholder="Motivo de rechazo">
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🤖 Bot Discord</h2>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">http://127.0.0.1:8000/api/bot/metrics/</span>
+                <div class="actions">
+                    <button class="btn-test" onclick="testEndpoint('GET', 'http://127.0.0.1:8000/api/bot/metrics/')">Test</button>
+                    <button class="btn-open" onclick="window.open('http://127.0.0.1:8000/api/bot/metrics/')">Abrir</button>
+                </div>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">http://127.0.0.1:8000/api/bot/status/</span>
+                <div class="actions">
+                    <button class="btn-test" onclick="testEndpoint('GET', 'http://127.0.0.1:8000/api/bot/status/')">Test</button>
+                    <button class="btn-open" onclick="window.open('http://127.0.0.1:8000/api/bot/status/')">Abrir</button>
+                </div>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">http://127.0.0.1:8000/api/bot/resumen/</span>
+                <div class="actions">
+                    <button class="btn-test" onclick="testEndpoint('GET', 'http://127.0.0.1:8000/api/bot/resumen/')">Test</button>
+                    <button class="btn-open" onclick="window.open('http://127.0.0.1:8000/api/bot/resumen/')">Abrir</button>
+                </div>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="url">http://127.0.0.1:8000/api/bot/servers/</span>
+                <div class="actions">
+                    <button class="btn-test" onclick="testEndpoint('GET', 'http://127.0.0.1:8000/api/bot/servers/')">Test</button>
+                    <button class="btn-open" onclick="window.open('http://127.0.0.1:8000/api/bot/servers/')">Abrir</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="result" class="result"></div>
+    </div>
+    
+    <script>
+        // Establecer fecha por defecto (ayer)
+        document.getElementById('fecha').value = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+        
+        function showResult(success, message, data) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = 'result show ' + (success ? 'success' : 'error');
+            resultDiv.innerHTML = `
+                <strong>${success ? '✓ Éxito' : '✗ Error'}</strong>
+                <span class="status ${success ? 'success' : 'error'}">${success ? '200 OK' : 'Error'}</span>
+                <p>${message}</p>
+                ${data ? '<pre>' + JSON.stringify(data, null, 2) + '</pre>' : ''}
+            `;
+            resultDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        async function testEndpoint(method, url) {
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult(true, `Endpoint: ${url}`, data);
+                } else {
+                    showResult(false, `Error ${response.status}: ${response.statusText}`, data);
+                }
+            } catch (error) {
+                showResult(false, `Error de conexión: ${error.message}`, null);
+            }
+        }
+        
+        async function testCreateJustificacion() {
+            const practicanteId = document.getElementById('practicante_id').value;
+            const fecha = document.getElementById('fecha').value;
+            const motivo = document.getElementById('motivo').value;
+            
+            if (!practicanteId || !fecha || !motivo) {
+                showResult(false, 'Por favor completa todos los campos', null);
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/puntualidad/justificaciones/crear/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        practicante_id: parseInt(practicanteId),
+                        fecha: fecha,
+                        motivo: motivo,
+                        tiene_evidencia: false
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult(true, 'Justificación creada exitosamente', data);
+                } else {
+                    showResult(false, `Error ${response.status}: ${data.error || response.statusText}`, data);
+                }
+            } catch (error) {
+                showResult(false, `Error de conexión: ${error.message}`, null);
+            }
+        }
+        
+        async function testAprobarJustificacion() {
+            const id = document.getElementById('justificacion_id_aprobar').value;
+            
+            if (!id) {
+                showResult(false, 'Por favor ingresa un ID de justificación', null);
+                return;
+            }
+            
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/puntualidad/justificaciones/${id}/aprobar/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult(true, 'Justificación aprobada exitosamente', data);
+                } else {
+                    showResult(false, `Error ${response.status}: ${data.error || response.statusText}`, data);
+                }
+            } catch (error) {
+                showResult(false, `Error de conexión: ${error.message}`, null);
+            }
+        }
+        
+        async function testRechazarJustificacion() {
+            const id = document.getElementById('justificacion_id_rechazar').value;
+            const motivoRechazo = document.getElementById('motivo_rechazo').value;
+            
+            if (!id || !motivoRechazo) {
+                showResult(false, 'Por favor completa todos los campos', null);
+                return;
+            }
+            
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/puntualidad/justificaciones/${id}/rechazar/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        motivo_rechazo: motivoRechazo
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult(true, 'Justificación rechazada exitosamente', data);
+                } else {
+                    showResult(false, `Error ${response.status}: ${data.error || response.statusText}`, data);
+                }
+            } catch (error) {
+                showResult(false, `Error de conexión: ${error.message}`, null);
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+
