@@ -26,3 +26,62 @@ class Practicante(models.Model):
 
     def __str__(self):
         return f'{self.nombre} {self.apellido}'
+
+class Asistencia(models.Model):
+    practicante = models.ForeignKey(Practicante, on_delete=models.CASCADE, related_name='asistencias')
+    fecha = models.DateField()
+    hora_entrada = models.TimeField()
+    hora_salida = models.TimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'asistencia'
+        verbose_name = 'Asistencia'
+        verbose_name_plural = 'Asistencias'
+        unique_together = (('practicante', 'fecha'),)
+
+class Horario(models.Model):
+    DIAS_SEMANA = [
+        ('lunes', 'Lunes'),
+        ('martes', 'Martes'),
+        ('miercoles', 'Miércoles'),
+        ('jueves', 'Jueves'),
+        ('viernes', 'Viernes'),
+        ('sabado', 'Sábado'),
+        ('domingo', 'Domingo'),
+    ]
+    practicante = models.ForeignKey(Practicante, on_delete=models.CASCADE, related_name='horarios')
+    dia_semana = models.CharField(max_length=10, choices=DIAS_SEMANA)
+    hora_inicio = models.TimeField()
+    hora_fin = models.TimeField()
+
+    class Meta:
+        db_table = 'horario'
+        verbose_name = 'Horario'
+        verbose_name_plural = 'Horarios'
+        unique_together = (('practicante', 'dia_semana', 'hora_inicio'),)
+
+class Advertencia(models.Model):
+    TIPO_CHOICES = [
+        ('retraso', 'Retraso'),
+        ('falta', 'Falta'),
+        ('inasistencia', 'Inasistencia'),
+        ('otro', 'Otro'),
+    ]
+    GRAVEDAD_CHOICES = [
+        ('leve', 'Leve'),
+        ('moderada', 'Moderada'),
+        ('grave', 'Grave'),
+    ]
+    practicante = models.ForeignKey(Practicante, on_delete=models.CASCADE, related_name='advertencias')
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES)
+    gravedad = models.CharField(max_length=20, choices=GRAVEDAD_CHOICES, default='leve')
+    descripcion = models.TextField()
+    fecha = models.DateField(auto_now_add=True)
+    resuelta = models.BooleanField(default=False)
+    fecha_resolucion = models.DateField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'advertencia'
+        verbose_name = 'Advertencia'
+        verbose_name_plural = 'Advertencias'
+        ordering = ['-fecha']

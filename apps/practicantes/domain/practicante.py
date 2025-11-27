@@ -46,3 +46,33 @@ class Practicante:
 
     def __str__(self):
         return f"[{self.id_discord}] {self.nombre_completo} - {self.estado.value}"
+
+# Entidad de dominio que representa una asistencia
+@dataclass
+class Asistencia:
+    id: Optional[int]
+    practicante_id: int
+    fecha: str  # Formato 'YYYY-MM-DD'
+    hora_entrada: str  # Formato 'HH:MM:SS'
+    hora_salida: Optional[str] = None
+
+# Entidad de dominio que representa un horario
+@dataclass
+class Horario:
+    id: Optional[int]
+    practicante_id: int
+    dia_semana: str  # Ejemplo: 'lunes', 'martes', ...
+    hora_inicio: str  # Formato 'HH:MM:SS'
+    hora_fin: str  # Formato 'HH:MM:SS'
+
+# Entidad de dominio que representa una advertencia
+@dataclass
+class Advertencia:
+    id: Optional[int]
+    practicante_id: int
+    tipo: str  # 'retraso', 'falta', 'inasistencia', 'otro'
+    gravedad: str  # 'leve', 'moderada', 'grave'
+    descripcion: str
+    fecha: str  # Formato 'YYYY-MM-DD'
+    resuelta: bool = False
+    fecha_resolucion: Optional[str] = None
