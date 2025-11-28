@@ -24,15 +24,10 @@ Este módulo permite gestionar el historial de acciones realizadas por y sobre l
 #### Estadísticas de Historial
 ```typescript
 {
-  "total_registros": number,
-  "total_advertencias": number,
-  "total_traslados": number,
-  "total_expulsiones": number,
-  "total_practicantes": number,
-  "total_activos": number,
-  "total_trasladados": number,
-  "total_expulsados": number,
-  "total_en_reforzamiento": number
+  "total_registros": number,    // Número total de registros
+  "total_advertencias": number, // Total de advertencias
+  "total_traslados": number,    // Total de traslados
+  "total_expulsiones": number   // Total de expulsiones
 }
 ```
 
@@ -84,12 +79,7 @@ Este módulo permite gestionar el historial de acciones realizadas por y sobre l
     "total_registros": 100,
     "total_advertencias": 50,
     "total_traslados": 20,
-    "total_expulsiones": 5,
-    "total_practicantes": 30,
-    "total_activos": 25,
-    "total_trasladados": 3,
-    "total_expulsados": 2,
-    "total_en_reforzamiento": 5
+    "total_expulsiones": 5
   }
   ```
 

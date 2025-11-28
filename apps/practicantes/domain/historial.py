@@ -41,15 +41,19 @@ class ResumenPracticante:
 
 @dataclass
 class EstadisticasHistorial:
-    total_registros: int
-    total_advertencias: int
-    total_traslados: int
-    total_expulsiones: int
-    total_practicantes: int
-    total_activos: int
-    total_trasladados: int
-    total_expulsados: int
-    total_en_reforzamiento: int
+    """
+    Estadísticas del historial de acciones de practicantes.
+    
+    Atributos:
+        total_registros: Número total de registros en el historial
+        total_advertencias: Número total de advertencias registradas
+        total_traslados: Número total de traslados registrados
+        total_expulsiones: Número total de expulsiones registradas
+    """
+    total_registros: int = 0
+    total_advertencias: int = 0
+    total_traslados: int = 0
+    total_expulsiones: int = 0
 
 @dataclass
 class FiltrosHistorial:
