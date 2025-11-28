@@ -1,4 +1,5 @@
 from django.urls import path, include
+# Configuración de URLs para el módulo de practicantes
 from rest_framework.routers import DefaultRouter, SimpleRouter
 from .views import (
     PracticanteViewSet, 
