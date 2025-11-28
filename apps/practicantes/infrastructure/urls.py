@@ -1,15 +1,15 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter, SimpleRouter
 
-# Importaciones de vistas
+# Importaciones de vistas del dashboard
 from .views import (
-    PracticanteViewSet,
     AsistenciaViewSet,
     HorarioViewSet,
     InicioViewSet,
     CalendarioSemanalViewSet,
     EstadisticasPersonalesViewSet,
-    AdvertenciaViewSet
+    AdvertenciaViewSet,
+    PracticanteViewSet
 )
 
 # Importaciones de vistas de historial
@@ -21,21 +21,18 @@ from .api.views.historial_views import (
 
 # 1. Router principal para los practicantes (CRUD básico)
 router = DefaultRouter()
-router.register(r'', PracticanteViewSet, basename='practicante')
+router.register(r'practicantes', PracticanteViewSet, basename='practicante')
 
 # 2. Router para el dashboard
-# Usamos SimpleRouter ya que no necesitamos el detalle de las rutas
-# que proporciona DefaultRouter
-api_router = SimpleRouter()
-api_router.register(r'inicio', InicioViewSet, basename='api-inicio')
-api_router.register(r'mi-asistencia', AsistenciaViewSet, basename='api-mi-asistencia')
-api_router.register(r'mi-horario', HorarioViewSet, basename='api-mi-horario')
-api_router.register(r'calendario-semanal', CalendarioSemanalViewSet, basename='api-calendario-semanal')
-api_router.register(r'estadisticas-personales', EstadisticasPersonalesViewSet, basename='api-estadisticas-personales')
-api_router.register(r'advertencias', AdvertenciaViewSet, basename='api-advertencias')
+dashboard_router = SimpleRouter()
+dashboard_router.register(r'inicio', InicioViewSet, basename='dashboard-inicio')
+dashboard_router.register(r'mi-asistencia', AsistenciaViewSet, basename='dashboard-asistencia')
+dashboard_router.register(r'mi-horario', HorarioViewSet, basename='dashboard-horario')
+dashboard_router.register(r'calendario-semanal', CalendarioSemanalViewSet, basename='dashboard-calendario')
+dashboard_router.register(r'estadisticas-personales', EstadisticasPersonalesViewSet, basename='dashboard-estadisticas')
+dashboard_router.register(r'advertencias', AdvertenciaViewSet, basename='dashboard-advertencias')
 
 # 3. URLs para el módulo de historial
-# Estas son rutas APIView personalizadas que no usan ViewSets
 historial_urlpatterns = [
     path('historial/', HistorialAPIView.as_view(), name='historial-list'),
     path('historial/estadisticas/', EstadisticasHistorialAPIView.as_view(), name='historial-estadisticas'),
@@ -44,12 +41,15 @@ historial_urlpatterns = [
 
 # Configuración final de URLs
 urlpatterns = [
-    # Rutas de la API principal
-    path('', include(router.urls)),
-    
-    # Rutas del dashboard bajo /api/dashboard/
-    path('api/dashboard/', include(api_router.urls)),
-    
-    # Rutas del historial
-    path('api/', include(historial_urlpatterns)),
+    # API v1 - Todas las rutas bajo /api/v1/
+    path('api/v1/', include([
+        # Rutas de la API principal
+        path('', include(router.urls)),
+        
+        # Rutas del dashboard
+        path('dashboard/', include(dashboard_router.urls)),
+        
+        # Rutas del historial
+        path('', include(historial_urlpatterns)),
+    ])),
 ]
