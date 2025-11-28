@@ -1,15 +1,15 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter, SimpleRouter
 
-# Importaciones de vistas del dashboard
+# Importaciones de vistas del dashboard y practicantes
 from .views import (
+    PracticanteViewSet,
     AsistenciaViewSet,
     HorarioViewSet,
     InicioViewSet,
     CalendarioSemanalViewSet,
     EstadisticasPersonalesViewSet,
-    AdvertenciaViewSet,
-    PracticanteViewSet
+    AdvertenciaViewSet
 )
 
 # Importaciones de vistas de historial
