@@ -1,0 +1,32 @@
+# docker-compose.yml
+version: '3.9'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: postgres_horarios
+    environment:
+      POSTGRES_DB: horarios_practicantes
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    restart: unless-stopped
+
+  backend:
+    build: .
+    container_name: backend_horarios
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://admin:admin123@db:5432/horarios_practicantes
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
