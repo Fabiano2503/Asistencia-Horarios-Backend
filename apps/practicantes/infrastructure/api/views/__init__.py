@@ -1,1 +1,0 @@
-# Archivo de inicialización del paquete de vistas
