@@ -54,87 +54,55 @@ class PracticanteRepository(ABC):
 
 class HistorialRepository(ABC):
     @abstractmethod
-    def obtener_estadisticas(self) -> EstadisticasHistorial:
+    def obtener_estadisticas(self, fecha_desde: Optional[datetime] = None, fecha_hasta: Optional[datetime] = None) -> EstadisticasHistorial:
         """
         Obtiene estadísticas generales del historial de practicantes
         
+        Args:
+            fecha_desde: Fecha desde la cual obtener estadísticas
+            fecha_hasta: Fecha hasta la cual obtener estadísticas
+            
         Returns:
             EstadisticasHistorial: Objeto con las estadísticas
         """
         pass
 
     @abstractmethod
-    def obtener_historial_detallado(
+    def obtener_historial(
         self,
-        filtros: FiltrosHistorial,
-        pagina: int = 1,
-        por_pagina: int = 10
+        busqueda: Optional[str] = None,
+        area: Optional[str] = None,
+        tipo_accion: Optional[TipoAccion] = None,
+        estado: Optional[EstadoPracticante] = None,
+        fecha_desde: Optional[datetime] = None,
+        fecha_hasta: Optional[datetime] = None,
+        orden: str = '-fecha_accion'
     ) -> List[AccionPracticante]:
         """
-        Obtiene el historial detallado de acciones con filtros
+        Obtiene el historial de acciones con filtros opcionales.
         
         Args:
-            filtros: Filtros a aplicar a la búsqueda
-            pagina: Número de página para la paginación
-            por_pagina: Cantidad de elementos por página
+            busqueda: Término de búsqueda para filtrar por nombre o apellido del practicante
+            area: Área para filtrar las acciones
+            tipo_accion: Tipo de acción a filtrar
+            estado: Estado del practicante a filtrar
+            fecha_desde: Fecha mínima de las acciones
+            fecha_hasta: Fecha máxima de las acciones
+            orden: Campo por el que ordenar los resultados (prefijo '-' para orden descendente)
             
         Returns:
-            Lista de acciones de practicantes que coinciden con los filtros
+            Lista de acciones de historial que coinciden con los filtros
         """
         pass
 
     @abstractmethod
-    def contar_historial_detallado(self, filtros: FiltrosHistorial) -> int:
-        """
-        Cuenta el total de registros que coinciden con los filtros
-        
-        Args:
-            filtros: Filtros a aplicar al conteo
-            
-        Returns:
-            Número total de registros que coinciden con los filtros
-        """
-        pass
-
-    @abstractmethod
-    def obtener_resumen_practicantes(
-        self,
-        filtros: FiltrosHistorial
-    ) -> List[ResumenPracticante]:
-        """
-        Obtiene un resumen de todos los practicantes con sus estadísticas
-        
-        Args:
-            filtros: Filtros a aplicar a la búsqueda
-            
-        Returns:
-            Lista de resúmenes de practicantes
-        """
-        pass
-
-    @abstractmethod
-    def obtener_practicante_por_id(self, practicante_id: int) -> Optional[ResumenPracticante]:
-        """
-        Obtiene el resumen de un practicante específico por su ID
-        
-        Args:
-            practicante_id: ID del practicante a buscar
-            
-        Returns:
-            Resumen del practicante o None si no se encuentra
-        """
-        pass
-
-    @abstractmethod
-    def crear_accion(
+    def registrar_accion(
         self,
         practicante_id: int,
-        tipo: TipoAccion,
-        motivo: str,
-        detalles: str,
-        area: str,
-        estado: EstadoPracticante,
-        numero_advertencia: Optional[int] = None
+        tipo_accion: TipoAccion,
+        descripcion: str,
+        usuario_id: int,
+        detalles: Dict[str, Any]
     ) -> AccionPracticante:
         """
         Crea una nueva acción en el historial de un practicante

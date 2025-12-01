@@ -85,3 +85,42 @@ class Advertencia(models.Model):
         verbose_name = 'Advertencia'
         verbose_name_plural = 'Advertencias'
         ordering = ['-fecha']
+
+
+class AccionPracticante(models.Model):
+    """
+    Modelo que representa una acción realizada sobre un practicante.
+    """
+    TIPO_ACCION_CHOICES = [
+        ('registro', 'Registro'),
+        ('actualizacion', 'Actualización'),
+        ('eliminacion', 'Eliminación'),
+        ('advertencia', 'Advertencia'),
+        ('sancion', 'Sanción'),
+        ('otro', 'Otro'),
+    ]
+
+    ESTADO_CHOICES = [
+        ('activo', 'Activo'),
+        ('en_recuperacion', 'En Recuperación'),
+        ('en_riesgo', 'En Riesgo'),
+    ]
+
+    practicante = models.ForeignKey(Practicante, on_delete=models.CASCADE, related_name='acciones')
+    tipo_accion = models.CharField(max_length=50, choices=TIPO_ACCION_CHOICES)
+    descripcion = models.TextField()
+    fecha_accion = models.DateTimeField(auto_now_add=True)
+    usuario = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True)
+    detalles = models.JSONField(default=dict, blank=True)
+    area = models.CharField(max_length=100, blank=True)
+    estado = models.CharField(max_length=50, choices=ESTADO_CHOICES, blank=True)
+    numero_advertencia = models.PositiveIntegerField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'accion_practicante'
+        ordering = ['-fecha_accion']
+        verbose_name = 'Acción de Practicante'
+        verbose_name_plural = 'Acciones de Practicantes'
+
+    def __str__(self):
+        return f"{self.get_tipo_accion_display()} - {self.practicante} ({self.fecha_accion})"

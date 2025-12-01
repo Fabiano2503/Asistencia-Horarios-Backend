@@ -1,6 +1,8 @@
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
+from datetime import datetime
 from apps.practicantes.domain.practicante import Practicante, EstadoPracticante, Asistencia
-from apps.practicantes.domain.repositories import PracticanteRepository, AsistenciaRepository
+from apps.practicantes.domain.repositories import PracticanteRepository, AsistenciaRepository, HistorialRepository
+from apps.practicantes.domain.historial import AccionPracticante, TipoAccion, EstadoPracticante as EstadoPracticanteHistorial, EstadisticasHistorial
 
 # Clase de servicio para gestionar la lógica de negocio relacionada con los practicantes
 class PracticanteService:
@@ -99,3 +101,96 @@ class AdvertenciaService:
 
     def get_advertencia_stats_by_practicante(self, practicante_id: int):
         return self.advertencia_repository.get_stats_by_practicante(practicante_id)
+
+
+class HistorialService:
+    """
+    Servicio para gestionar el historial de acciones de los practicantes.
+    """
+    
+    def __init__(self, historial_repository: HistorialRepository):
+        self.historial_repository = historial_repository
+
+    def obtener_historial(
+        self,
+        busqueda: Optional[str] = None,
+        area: Optional[str] = None,
+        tipo_accion: Optional[TipoAccion] = None,
+        estado: Optional[EstadoPracticanteHistorial] = None,
+        fecha_desde: Optional[datetime] = None,
+        fecha_hasta: Optional[datetime] = None,
+        orden: str = '-fecha_accion'
+    ) -> List[AccionPracticante]:
+        """
+        Obtiene el historial de acciones con filtros opcionales.
+        
+        Args:
+            busqueda: Término de búsqueda para filtrar por nombre o apellido del practicante
+            area: Área para filtrar las acciones
+            tipo_accion: Tipo de acción a filtrar
+            estado: Estado del practicante a filtrar
+            fecha_desde: Fecha mínima de las acciones
+            fecha_hasta: Fecha máxima de las acciones
+            orden: Campo por el que ordenar los resultados (prefijo '-' para orden descendente)
+            
+        Returns:
+            Lista de acciones de historial que coinciden con los filtros
+        """
+        return self.historial_repository.obtener_historial(
+            busqueda=busqueda,
+            area=area,
+            tipo_accion=tipo_accion,
+            estado=estado,
+            fecha_desde=fecha_desde,
+            fecha_hasta=fecha_hasta,
+            orden=orden
+        )
+
+    def obtener_estadisticas(
+        self,
+        fecha_desde: Optional[datetime] = None,
+        fecha_hasta: Optional[datetime] = None
+    ) -> EstadisticasHistorial:
+        """
+        Obtiene estadísticas del historial de acciones.
+        
+        Args:
+            fecha_desde: Fecha mínima para las estadísticas
+            fecha_hasta: Fecha máxima para las estadísticas
+            
+        Returns:
+            Objeto EstadisticasHistorial con las estadísticas calculadas
+        """
+        return self.historial_repository.obtener_estadisticas(
+            fecha_desde=fecha_desde,
+            fecha_hasta=fecha_hasta
+        )
+
+    def registrar_accion(
+        self,
+        practicante_id: int,
+        tipo_accion: TipoAccion,
+        descripcion: str,
+        usuario_id: int,
+        detalles: Optional[Dict[str, Any]] = None
+    ) -> AccionPracticante:
+        """
+        Registra una nueva acción en el historial.
+        
+        Args:
+            practicante_id: ID del practicante relacionado con la acción
+            tipo_accion: Tipo de acción realizada
+            descripcion: Descripción detallada de la acción
+            usuario_id: ID del usuario que realizó la acción
+            detalles: Datos adicionales sobre la acción
+            
+        Returns:
+            La acción de historial registrada
+        """
+        return self.historial_repository.registrar_accion(
+            practicante_id=practicante_id,
+            tipo_accion=tipo_accion,
+            descripcion=descripcion,
+            usuario_id=usuario_id,
+            detalles=detalles or {}
+        )

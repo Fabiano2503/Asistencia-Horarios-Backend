@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from datetime import datetime
 
-from apps.practicantes.application.historial_service import HistorialService
+from apps.practicantes.application.services import HistorialService
 from apps.practicantes.infrastructure.historial_repository import DjangoORMHistorialRepository
 from apps.practicantes.domain.historial import (
     TipoAccion,
