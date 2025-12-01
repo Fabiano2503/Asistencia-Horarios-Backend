@@ -229,3 +229,171 @@ Este módulo permite gestionar el historial de acciones realizadas por y sobre l
     "en_riesgo": 0
   }
   ```
+
+## Endpoints del Dashboard del Practicante
+
+### Vista de Inicio
+
+- **GET /api/practicantes/dashboard/inicio/**
+- **Query Params:**
+  - `practicante_id` (integer, opcional): ID del practicante (por defecto: 1)
+- **Respuesta:**
+  ```json
+  {
+    "mensaje": "Bienvenido/a - Inicio Práctica",
+    "practicante_id": 1
+  }
+  ```
+
+### Mi Asistencia
+
+#### Listar Asistencias
+
+- **GET /api/practicantes/dashboard/mi-asistencia/**
+- **Query Params:**
+  - `practicante_id` (integer, opcional): ID del practicante (por defecto: 1)
+- **Respuesta:**
+  ```json
+  [
+    {
+      "id": 1,
+      "practicante_id": 1,
+      "fecha": "2025-11-27",
+      "hora_entrada": "08:00:00",
+      "hora_salida": null
+    }
+  ]
+  ```
+
+#### Registrar Asistencia
+
+- **POST /api/practicantes/dashboard/mi-asistencia/**
+- **Body:**
+  ```json
+  {
+    "practicante_id": 1,
+    "fecha": "2025-11-27",
+    "hora_entrada": "08:00:00",
+    "hora_salida": "17:00:00"
+  }
+  ```
+
+### Mi Horario
+
+#### Listar Horarios
+
+- **GET /api/practicantes/dashboard/mi-horario/**
+- **Query Params:**
+  - `practicante_id` (integer, opcional): ID del practicante (por defecto: 1)
+- **Respuesta:**
+  ```json
+  [
+    {
+      "id": 1,
+      "practicante_id": 1,
+      "dia_semana": "lunes",
+      "hora_inicio": "08:00:00",
+      "hora_fin": "17:00:00"
+    }
+  ]
+  ```
+
+#### Registrar Horario
+
+- **POST /api/practicantes/dashboard/mi-horario/**
+- **Body:**
+  ```json
+  {
+    "practicante_id": 1,
+    "dia_semana": "lunes",
+    "hora_inicio": "08:00:00",
+    "hora_fin": "17:00:00"
+  }
+  ```
+
+### Calendario Semanal
+
+#### Ver Calendario Semanal
+
+- **GET /api/practicantes/dashboard/calendario-semanal/**
+- **Query Params:**
+  - `practicante_id` (integer, opcional): ID del practicante (por defecto: 1)
+- **Respuesta:**
+  ```json
+  [
+    {
+      "fecha": "2025-11-24",
+      "dia_semana": "lunes",
+      "trabajó": false,
+      "horas_trabajadas": 0.0
+    },
+    {
+      "fecha": "2025-11-25",
+      "dia_semana": "martes",
+      "trabajó": true,
+      "horas_trabajadas": 5.0
+    }
+  ]
+  ```
+
+### Estadísticas Personales
+
+#### Ver Estadísticas de la Semana
+
+- **GET /api/practicantes/dashboard/estadisticas-personales/**
+- **Query Params:**
+  - `practicante_id` (integer, opcional): ID del practicante (por defecto: 1)
+- **Respuesta:**
+  ```json
+  {
+    "semana_actual": {
+      "inicio": "2025-11-24",
+      "fin": "2025-11-30"
+    },
+    "dias_trabajados": 1,
+    "dias_con_asistencia_completa": 1,
+    "total_horas_semana": 5.0,
+    "promedio_horas_diario": 5.0,
+    "dias_semana_total": 7
+  }
+  ```
+
+### Seguimiento Disciplinario
+
+#### Ver Advertencias
+
+- **GET /api/practicantes/dashboard/advertencias/**
+- **Query Params:**
+  - `practicante_id` (integer, opcional): ID del practicante (por defecto: 1)
+- **Respuesta:**
+  ```json
+  [
+    {
+      "id": 1,
+      "practicante_id": 1,
+      "tipo": "retraso",
+      "gravedad": "leve",
+      "descripcion": "Llegó 15 minutos tarde el lunes",
+      "fecha": "2025-11-24",
+      "resuelta": true,
+      "fecha_resolucion": null
+    }
+  ]
+  ```
+
+#### Ver Estadísticas de Advertencias
+
+- **GET /api/practicantes/dashboard/advertencias/estadisticas/**
+- **Query Params:**
+  - `practicante_id` (integer, opcional): ID del practicante (por defecto: 1)
+- **Respuesta:**
+  ```json
+  {
+    "total": 2,
+    "leves": 1,
+    "moderadas": 1,
+    "graves": 0,
+    "resueltas": 1,
+    "pendientes": 1
+  }
+  ```
