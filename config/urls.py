@@ -19,6 +19,12 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    # Rutas correctas según la estructura del proyecto
     path('api/practicantes/', include('apps.practicantes.infrastructure.urls')),
     path('api/bot/', include('apps.bot_discord.infrastructure.urls')),
+
+    # Tu nueva app puntualidad
+    path('api/puntualidad/', include('apps.puntualidad.urls')),
 ]
+
