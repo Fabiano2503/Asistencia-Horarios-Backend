@@ -1,3 +1,4 @@
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import HttpResponse
 import asyncio
@@ -19,42 +20,58 @@ def run_async(func, *args, **kwargs):
     return asyncio.run(func(*args, **kwargs))
 
 
-def dashboard_summary(request):
-    data = run_async(get_dashboard_summary)
-    return Response(data)
+# ----------------------------
+#   API JSON (APIView)
+# ----------------------------
+
+class DashboardSummaryView(APIView):
+    def get(self, request):
+        data = run_async(get_dashboard_summary)
+        return Response(data)
 
 
-def advertencias_mes_actual(request):
-    data = run_async(get_advertencias_mes_actual)
-    return Response(data)
+class AdvertenciasMesActualView(APIView):
+    def get(self, request):
+        data = run_async(get_advertencias_mes_actual)
+        return Response(data)
 
 
-def historial_advertencias(request):
-    page = int(request.GET.get("page", 1))
-    size = int(request.GET.get("size", 20))
-    data = run_async(get_historial_advertencias, page, size)
-    return Response(data)
+class HistorialAdvertenciasView(APIView):
+    def get(self, request):
+        page = int(request.GET.get("page", 1))
+        size = int(request.GET.get("size", 20))
+        data = run_async(get_historial_advertencias, page, size)
+        return Response(data)
 
 
-def detalle_cumplimiento_horas(request):
-    data = run_async(get_detalle_cumplimiento_horas)
-    return Response(data)
+class DetalleCumplimientoHorasView(APIView):
+    def get(self, request):
+        data = run_async(get_detalle_cumplimiento_horas)
+        return Response(data)
 
 
-def resumen_global_horas(request):
-    data = run_async(get_resumen_global_horas)
-    return Response(data)
+class ResumenGlobalHorasView(APIView):
+    def get(self, request):
+        data = run_async(get_resumen_global_horas)
+        return Response(data)
 
 
-def permisos_semana_actual(request):
-    data = run_async(get_permisos_semana_actual)
-    return Response(data)
+class PermisosSemanaActualView(APIView):
+    def get(self, request):
+        data = run_async(get_permisos_semana_actual)
+        return Response(data)
 
 
-def resumen_permisos_practicante(request):
-    data = run_async(get_resumen_permisos_practicante)
-    return Response(data)
+class ResumenPermisosPracticanteView(APIView):
+    def get(self, request):
+        data = run_async(get_resumen_permisos_practicante)
+        return Response(data)
 
+
+# ----------------------------
+#   EXPORTADORES (archivos Excel)
+#   Estos NO deben ser APIView
+# ----------------------------
 
 def export_reporte_semanal(request):
     buffer = BytesIO()
