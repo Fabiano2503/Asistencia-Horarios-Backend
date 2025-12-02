@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'apps.practicantes',
     'apps.bot_discord',
+    'apps.puntualidad',
 ]
 
 MIDDLEWARE = [
