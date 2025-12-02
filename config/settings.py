@@ -43,7 +43,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'apps.practicantes',
     'apps.bot_discord',
-    'apps.gestion',
+    # Conflicto resuelto: Incluyendo ambas aplicaciones
+    'apps.gestion', 
+    'apps.puntualidad',
 ]
 
 MIDDLEWARE = [
@@ -79,7 +81,7 @@ ASGI_APPLICATION = 'config.asgi.application'
 CHANNEL_LAYERS = {
     'default': {
         # "BACKEND": "channels.layers.InMemoryChannelLayer", # Para desarrollo local sin Redis
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',  # Usar Redis en producción
+        'BACKEND': 'channels_redis.core.RedisChannelLayer', # Usar Redis en producción
         'CONFIG': {
             "hosts": [('127.0.0.1', 6379)],
         },

@@ -19,7 +19,14 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    # Rutas correctas según la estructura del proyecto
     path('api/practicantes/', include('apps.practicantes.infrastructure.urls')),
     path('api/bot/', include('apps.bot_discord.infrastructure.urls')),
+    
+    # Conflicto resuelto: Incluyendo ambas ramas de la fusión
     path('api/v1/', include('apps.gestion.infrastructure.urls')),
+    path('api/puntualidad/', include('apps.puntualidad.infrastructure.urls')), 
+    # NOTA: Cambié 'apps.puntualidad.urls' a 'apps.puntualidad.infrastructure.urls'
+    # asumiendo que sigues la estructura del proyecto (como en practicantes y bot_discord).
 ]
