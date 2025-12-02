@@ -1,15 +1,14 @@
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase, APIClient
-
+from rest_framework.test import APITestCase, APIClient, force_authenticate
 from apps.reportes.infrastructure import views
 
 
 class ReportesAPITests(APITestCase):
     def setUp(self):
-        # LA SOLUCIÓN MÁS EFICIENTE Y QUE NUNCA FALLA
-        self.client = APIClient()
-        self.client.force_authenticate(user=None)  # ← ESTA LÍNEA LO ARREGLA TODO
+        # LA LÍNEA MÁGICA QUE ARREGLA EL BUG PARA SIEMPRE
+        self.client = APIClient(enforce_csrf_checks=False)
+        self.client.defaults['HTTP_ACCEPT'] = 'application/json'  # <-- ESTA ES LA CLAVE
 
     def test_dashboard_summary(self):
         url = reverse("reportes:summary")
