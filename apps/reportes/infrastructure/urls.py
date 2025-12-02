@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 
 # Nombre del namespace del módulo
-app_name = "reporte"
+app_name = "reportes"
 
 urlpatterns = [
     path("summary", views.dashboard_summary, name="summary"),
