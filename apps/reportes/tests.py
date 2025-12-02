@@ -3,14 +3,18 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
-# Import correcto (tu carpeta está en minúsculas en CI)
+# Import correcto (tu carpeta está en minúsculas)
 from apps.reportes.infrastructure import views
 
 
 class ReportesAPITests(APITestCase):
     def setUp(self):
-        # Esto arregla el error de ".accepted_renderer not set"
+        # ESTO ES LO QUE ARREGLA TODO EL ERROR ".accepted_renderer not set"
         self.client = APIClient()
+        # Forzamos JSON como renderer por defecto (el más común y rápido)
+        self.client.default_format = 'json'
+        # También puedes forzar headers si querés
+        self.client.credentials(HTTP_ACCEPT='application/json')
 
     def test_dashboard_summary(self):
         url = reverse("reportes:summary")
@@ -51,7 +55,11 @@ class ReportesAPITests(APITestCase):
         url = reverse("reportes:export_reporte_semanal")
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("excel", response.headers.get("Content-Type", ""))
+        # Fix: el Content-Type real del Excel
+        self.assertEqual(
+            response.headers["Content-Type"],
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
 
     def test_export_reporte_mensual(self):
         url = reverse("reportes:export_reporte_mensual")
@@ -60,10 +68,9 @@ class ReportesAPITests(APITestCase):
 
 
 class SmokeTest(TestCase):
-    def test_importar_views_sin_errores(self):
-        """Solo verifica que el módulo se importe correctamente"""
-        # Con esto ya no falla aunque los nombres de funciones sean distintos
+    def test_importar_views(self):
+        """Solo verifica que el módulo se importe sin errores"""
         try:
             import apps.reportes.infrastructure.views  # noqa: F401
-        except ImportError as e:
-            self.fail(f"No se pudo importar el módulo views: {e}")
+        except Exception as e:
+            self.fail(f"No se pudo importar views: {e}")
