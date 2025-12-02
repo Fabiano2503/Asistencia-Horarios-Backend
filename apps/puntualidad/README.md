@@ -1,127 +1,127 @@
-# Módulo Puntualidad-Asistencia
+# Módulo: Puntualidad y Asistencia
 
-Sistema de gestión de asistencia, puntualidad, justificaciones y recuperaciones de practicantes implementado con **Arquitectura Hexagonal (Ports and Adapters)**.
+## 1. Descripción del Módulo
 
-## 📋 Resumen
+Este módulo gestiona la puntualidad y asistencia de los practicantes, incluyendo el registro de asistencias, justificaciones y recuperaciones de horas.
 
-Este módulo gestiona el registro de asistencia diaria de practicantes, incluyendo:
-- Control de puntualidad y asistencia
-- Sistema de justificaciones con límite de tickets mensuales (máximo 3 por mes)
-- Gestión de recuperaciones de horas
-- Alertas automáticas de tardanzas y ausencias
-- Resumen diario de asistencia
+- **Responsabilidad principal:** Monitorear y gestionar la asistencia de los practicantes.
+- **Relación con otros módulos:** Depende del módulo de `practicantes` para obtener la información de los mismos.
+- **Arquitectura Hexagonal:**
+  - **Dominio:** Define las entidades `Asistencia`, `HorarioClases`, `AsistenciaRecuperacion`, y sus respectivos repositorios.
+  - **Aplicación:** Contiene los servicios para los casos de uso, como `ResumenPuntualidadService`, `CrearJustificacionService`, etc.
+  - **Infraestructura:** Implementa las vistas, serializers y repositorios utilizando Django y DRF.
 
-## 🚀 Tecnologías
+## 2. Documentación de Endpoints
 
-- **Django 5.2.8** - Framework web
-- **Django REST Framework** - API REST
-- **Python 3.10+** - Lenguaje de programación
-- **SQLite** - Base de datos (desarrollo)
+### `GET /api/puntualidad/resumen/`
 
-## 📦 Instalación Rápida
+- **Descripción:** Devuelve un resumen de la puntualidad del día actual.
+- **Servicio de Aplicación:** `ResumenPuntualidadService`
+- **Ejemplo de Respuesta:**
+  ```json
+  {
+    "asistencias": 10,
+    "tardanzas": 2,
+    "faltas": 3,
+    "total": 15,
+    "con_clases": 12,
+    "ausentes_justificados": 1,
+    "ausentes_sin_justificar": 2
+  }
+  ```
 
-```bash
-cd backend
-python -m venv venv
-venv\Scripts\activate  # Windows
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver
-```
+### `GET /api/puntualidad/alertas/`
 
-## 🏗️ Arquitectura Hexagonal
+- **Descripción:** Devuelve alertas automáticas de puntualidad.
+- **Servicio de Aplicación:** `AlertasPuntualidadService`
+- **Ejemplo de Respuesta:**
+  ```json
+  [
+    {
+      "tipo": "tardanza",
+      "titulo": "Tardanza potencial detectada",
+      "cantidad": 2,
+      "hora": "8:05 a.m.",
+      "descripcion": "Gracia de 5 minutos aplicada",
+      "practicantes": ["Juan Pérez", "Ana Gómez"]
+    }
+  ]
+  ```
 
-El módulo implementa **Arquitectura Hexagonal** con separación de capas:
+### `GET /api/puntualidad/practicantes/`
 
-```
-apps/puntualidad/
-├── domain/              # Capa de Dominio (Núcleo)
-│   ├── entities.py      # Entidades: Asistencia, EstadoAsistencia, HorarioClases
-│   └── repositories.py  # Interfaces (Ports) de repositorios
-│
-├── application/          # Capa de Aplicación (Casos de Uso)
-│   └── services.py      # Servicios: ResumenPuntualidadService, AlertasPuntualidadService, etc.
-│
-└── infrastructure/       # Capa de Infraestructura (Adapters)
-    ├── models.py        # Modelos Django ORM
-    ├── django_orm_repository.py  # Implementaciones de repositorios
-    ├── serializers.py   # Serializers DRF
-    └── views.py         # Controladores/Views
-```
+- **Descripción:** Devuelve la lista de practicantes con su estado de asistencia del día.
+- **Ejemplo de Respuesta:**
+  ```json
+  [
+    {
+      "id": 1,
+      "nombre": "Juan",
+      "apellido": "Pérez",
+      "equipo": "Rpsoft",
+      "team": "Team Alpha",
+      "horaIngreso": "08:10 AM",
+      "horasSemanales": "24/30",
+      "horasCompletadas": 24,
+      "horasTotales": 30,
+      "estado": "tardanza",
+      "ticket": "TKT-123 - Cita médica"
+    }
+  ]
+  ```
 
-## 📱 Endpoints API
+### `GET /api/puntualidad/justificaciones/`
 
-### Resumen y Alertas
-- `GET /api/puntualidad/resumen/` - Resumen del día (asistencias, tardanzas, faltas)
-- `GET /api/puntualidad/alertas/` - Alertas automáticas (tardanzas, ausencias, practicantes en riesgo)
+- **Descripción:** Devuelve la lista de justificaciones.
+- **Servicio de Aplicación:** `ListarJustificacionesService`
 
-### Practicantes
-- `GET /api/puntualidad/practicantes/` - Lista de practicantes con estado de asistencia del día
-- `GET /api/puntualidad/practicantes/activos/` - Lista de practicantes activos
+### `POST /api/puntualidad/justificaciones/crear/`
 
-### Justificaciones
-- `GET /api/puntualidad/justificaciones/` - Listar todas las justificaciones
-- `POST /api/puntualidad/justificaciones/crear/` - Crear nueva justificación
-- `POST /api/puntualidad/justificaciones/{id}/aprobar/` - Aprobar justificación
-- `POST /api/puntualidad/justificaciones/{id}/rechazar/` - Rechazar justificación
+- **Descripción:** Crea una nueva justificación.
+- **Servicio de Aplicación:** `CrearJustificacionService`
+- **Request Body:** `JustificacionCreateSerializer`
+- **Ejemplo de Request:**
+  ```json
+  {
+    "practicante_id": 1,
+    "fecha": "2023-10-27",
+    "motivo": "Cita médica",
+    "ticket_id": "TKT-123"
+  }
+  ```
 
-### Recuperaciones
-- `GET /api/puntualidad/recuperaciones/` - Listar recuperaciones de horas
+### `POST /api/puntualidad/justificaciones/<int:pk>/aprobar/`
 
-## 📝 Funcionalidades Principales
+- **Descripción:** Aprueba una justificación.
+- **Servicio de Aplicación:** `AprobarJustificacionService`
 
-### 1. Sistema de Justificaciones
-- **Límite de tickets**: Máximo 3 tickets por mes por practicante
-- **SLA de 24 horas**: Tiempo máximo para revisar y aprobar justificaciones
-- **Estados**: Pendiente, Aprobado, Rechazado, Vencido
-- **Evidencia opcional**: Soporte para tickets de Trello o checklists
+### `POST /api/puntualidad/justificaciones/<int:pk>/rechazar/`
 
-### 2. Alertas Automáticas
-- **Tardanzas**: Detección automática con gracia de 5 minutos
-- **Ausencias sin clase**: Identificación de ausencias sin horario registrado
-- **Practicantes en riesgo**: Alerta cuando un practicante alcanza 3 ausencias sin justificar en el mes
+- **Descripción:** Rechaza una justificación.
+- **Servicio de Aplicación:** `RechazarJustificacionService`
+- **Request Body:**
+  ```json
+  {
+    "motivo_rechazo": "Falta de evidencia"
+  }
+  ```
 
-### 3. Gestión de Recuperaciones
-- Registro de horas de recuperación
-- Estados: Programado, En Progreso, Completado, Cancelado
-- Cálculo automático de horas completadas
+### `GET /api/puntualidad/recuperaciones/`
 
-## 📝 Cambios Realizados
+- **Descripción:** Devuelve la lista de recuperaciones de horas.
+- **Servicio de Aplicación:** `ListarRecuperacionesService`
 
-### Refactorización con Arquitectura Hexagonal
+### `GET /api/puntualidad/practicantes/activos/`
 
-1. **Separación de Capas:**
-   - **Domain**: Entidades de negocio independientes de frameworks
-   - **Application**: Servicios que implementan casos de uso
-   - **Infrastructure**: Implementaciones con Django ORM
+- **Descripción:** Devuelve una lista simple de practicantes activos.
 
-2. **Servicios Implementados:**
-   - `ResumenPuntualidadService` - Genera resumen diario de asistencia
-   - `AlertasPuntualidadService` - Genera alertas automáticas
-   - `ListarPracticantesPuntualidadService` - Lista practicantes con estado
-   - `ListarJustificacionesService` - Gestiona justificaciones
-   - `CrearJustificacionService` - Crea nuevas justificaciones
-   - `AprobarJustificacionService` - Aprueba justificaciones
-   - `RechazarJustificacionService` - Rechaza justificaciones
-   - `ListarRecuperacionesService` - Gestiona recuperaciones
+## 4. Requisitos y Configuración
 
-3. **Repositorios:**
-   - Interfaces definidas en `domain/repositories.py`
-   - Implementaciones en `infrastructure/django_orm_repository.py`
+- **Dependencias:** Django, djangorestframework.
+- **Migraciones:** Requiere que las migraciones del módulo se hayan ejecutado.
 
-### Beneficios Obtenidos
+## 5. Buenas Prácticas y Estándares
 
-- ✅ **Testabilidad**: Fácil crear mocks de repositorios para testing
-- ✅ **Mantenibilidad**: Separación clara de responsabilidades
-- ✅ **Escalabilidad**: Fácil cambiar implementaciones sin afectar el dominio
-- ✅ **Independencia**: La lógica de negocio no depende de Django
-
-## 🔧 Configuración
-
-Crea un archivo `.env` en la carpeta `backend/`:
-
-```env
-SECRET_KEY=tu-secret-key-aqui
-DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1
-```
+- **Servicios de Aplicación:** Cada caso de uso está encapsulado en su propio servicio.
+- **Validaciones:** Los serializers se utilizan para validar los datos de entrada en los endpoints de creación y actualización.
+- **Manejo de Errores:** Las vistas manejan excepciones y devuelven respuestas de error apropiadas.

@@ -1,61 +1,166 @@
-Sistema de Gestión de Horarios
+# Módulo: Horarios y Recuperaciones
 
-Python 3 + Django | Arquitectura Hexagonal
+## 1. Descripción del Módulo
 
-Este proyecto es un sistema básico para la gestión de horarios, construido con Django y siguiendo el enfoque de arquitectura hexagonal (ports & adapters).
-El objetivo es mantener una separación clara entre la lógica de negocio, la aplicación y las dependencias externas.
+Este módulo se encarga de la gestión de practicantes, horarios, y procesos de recuperación de clases. Proporciona una visión general del estado de los practicantes y sus horarios, y permite a los administradores gestionar las solicitudes de recuperación.
 
+- **Responsabilidad principal:** Gestionar la información de los practicantes, sus horarios y las solicitudes de recuperación de clases.
+- **Relación con otros módulos:** Este módulo interactúa con el módulo de `practicantes` para obtener la información de los mismos.
+- **Arquitectura Hexagonal:**
+  - **Dominio:** Define las entidades de negocio como `Practicante` y los contratos de los repositorios (`PracticanteRepository`, `AsistenciaRepository`, `HorarioRepository`, `AdvertenciaRepository`).
+  - **Aplicación:** Contiene los servicios que orquestan los casos de uso del negocio, como `DashboardService`, `HorarioService`, y `RecuperacionService`.
+  - **Infraestructura:** Implementa los detalles de la tecnología, incluyendo vistas de Django, serializers, y la implementación de los repositorios con el ORM de Django.
 
+## 2. Documentación de Endpoints
 
-Dijiste:
-Dame un readme de un sistema de gestión de horario algo básico esta con python + django y estructura hexagonal solo con domain, infraestructura, aplocatiom
-ChatGPT dijo:
-Aquí tienes un README.md básico, claro y listo para usar para un sistema de gestión de horarios desarrollado con Python + Django y una arquitectura hexagonal (domain, application, infrastructure).
-Lo puedes copiar/pegar y adaptar según tu proyecto.
+### Dashboard
 
-🕒 Sistema de Gestión de Horarios
-Python 3 + Django | Arquitectura Hexagonal
+#### `GET /api/gestion/dashboard/summary/`
 
-Este proyecto es un sistema básico para la gestión de horarios, construido con Django y siguiendo el enfoque de arquitectura hexagonal (ports & adapters).
-El objetivo es mantener una separación clara entre la lógica de negocio, la aplicación y las dependencias externas.
+-   **Descripción:** Obtiene un resumen del estado de los practicantes.
+-   **Servicio de Aplicación:** `DashboardService.get_summary`
+-   **Ejemplo de Respuesta:**
+    ```json
+    {
+      "practicantes_con_horario": "0/0",
+      "clases_hoy": 0,
+      "clases_parciales": 0,
+      "sin_horario_registrado": 0
+    }
+    ```
 
- Arquitectura Hexagonal 
-El sistema sigue 3 capas principales:
+### Horarios
 
-1. Domain (Núcleo del negocio)
-Contiene las entidades y lógica pura del dominio.
+#### `GET /api/gestion/horarios/semanales/`
 
-No depende de Django ni de ninguna tecnología.
+-   **Descripción:** Obtiene una vista semanal de los horarios.
+-   **Servicio de Aplicación:** `HorarioService.get_vista_semanal`
+-   **Ejemplo de Respuesta:**
+    ```json
+    {
+      "lunes": [],
+      "martes": [],
+      "miercoles": [],
+      "jueves": [],
+      "viernes": []
+    }
+    ```
 
-Ejemplos:
+### Practicantes
 
-Schedule: representa un horario.
+#### `GET /api/gestion/practicantes/`
 
-ScheduleService: lógica para crear, actualizar o validar horarios.
+-   **Descripción:** Lista todos los practicantes con su información básica.
+-   **Repositorio:** `PracticanteRepository.list_all_with_horario`
+-   **Ejemplo de Respuesta:**
+    ```json
+    [
+      {
+        "id": 1,
+        "nombre": "Juan Pérez",
+        "servidor": "Rpsoft",
+        "horario_completo": true
+      }
+    ]
+    ```
 
-2. Application (Casos de uso)
-Orquesta el flujo entre el dominio y las dependencias externas.
+#### `GET /api/gestion/practicantes/<int:practicante_id>/horario/`
 
-Expone Commands y Queries.
+-   **Descripción:** Obtiene el horario de un practicante específico.
+-   **Repositorio:** `PracticanteRepository.get_with_horario`
+-   **Ejemplo de Respuesta:**
+    ```json
+    [
+      {
+        "id": 1,
+        "dia": "lunes"
+      }
+    ]
+    ```
 
-Usa DTOs para intercambiar datos.
+#### `POST /api/gestion/practicantes/<int:practicante_id>/horario/actualizar/`
 
-Ejemplo: ManageScheduleUseCase.
+-   **Descripción:** Actualiza el horario de un practicante.
+-   **Servicio de Aplicación:** `HorarioService.actualizar_horario`
+-   **Parámetros:**
+    -   `body`: Datos del horario a actualizar.
+-   **Ejemplo de Respuesta:**
+    ```json
+    {
+      "message": "Horario actualizado"
+    }
+    ```
 
-3. Infrastructure (Adaptadores)
-Implementación concreta usando Django.
+#### `POST /api/gestion/practicantes/<int:practicante_id>/registrar/`
 
-Contiene:
+-   **Descripción:** Registra un horario con evidencia fotográfica.
+-   **Servicio de Aplicación:** `HorarioService.registrar_con_evidencia`
+-   **Parámetros:**
+    -   `body`: `foto` (archivo) y `bloques` (JSON).
+-   **Ejemplo de Respuesta:**
+    ```json
+    {
+      "message": "Horario enviado para aprobación"
+    }
+    ```
 
-Modelos Django (ORM)
+### Recuperaciones
 
-Serializadores
+#### `GET /api/gestion/recuperaciones/pendientes/`
 
-Vistas / API REST
+-   **Descripción:** Obtiene la lista de recuperaciones pendientes de aprobación.
+-   **Servicio de Aplicación:** `RecuperacionService.get_pendientes`
+-   **Ejemplo de Respuesta:** `[]` (vacío por defecto en el servicio)
 
-Repositorios concretos para acceder a la base de datos
+#### `GET /api/gestion/recuperaciones/<int:id>/`
 
-Instalación y Ejecución
-1. Clonar el repositorio
-git clone https://github.com/tu_usuario/gestion-horarios.git
-cd gestion-horarios
+-   **Descripción:** Obtiene el detalle de una solicitud de recuperación.
+-   **Servicio de Aplicación:** `RecuperacionService.get_by_id`
+-   **Ejemplo de Respuesta:** `{}` (vacío por defecto en el servicio)
+
+#### `POST /api/gestion/recuperaciones/<int:id>/aprobar/`
+
+-   **Descripción:** Aprueba una solicitud de recuperación.
+-   **Servicio de Aplicación:** `RecuperacionService.aprobar`
+-   **Ejemplo de Respuesta:**
+    ```json
+    {
+      "message": "Recuperación aprobada"
+    }
+    ```
+
+#### `POST /api/gestion/recuperaciones/<int:id>/rechazar/`
+
+-   **Descripción:** Rechaza una solicitud de recuperación.
+-   **Servicio de Aplicación:** `RecuperacionService.rechazar`
+-   **Parámetros:**
+    -   `body`: `motivo` (string).
+-   **Ejemplo de Respuesta:**
+    ```json
+    {
+      "message": "Recuperación rechazada"
+    }
+    ```
+
+### Servidores
+
+#### `GET /api/gestion/servidores/`
+
+-   **Descripción:** Obtiene la lista de servidores disponibles.
+-   **Respuesta Estática:**
+    ```json
+    ["Rpsoft", "SENATI", "Innovación", "MiniBootcamp", "Laboratorios", "Recuperación"]
+    ```
+
+## 4. Requisitos y Configuración
+
+-   **Dependencias:** Django.
+-   **Migraciones:** Requiere que las migraciones de los modelos de `gestion` y `practicantes` se hayan ejecutado.
+
+## 5. Buenas Prácticas y Estándares
+
+-   **Convenciones de Nombres:**
+    -   Servicios: `*Service` (e.g., `HorarioService`).
+    -   Repositorios: `*Repository` (e.g., `PracticanteRepository`).
+-   **Extensibilidad:** Para añadir nueva funcionalidad, se deben crear nuevos servicios en la capa de aplicación y, si es necesario, nuevos repositorios y entidades en el dominio. Las vistas en la capa de infraestructura deben ser lo más delgadas posible, delegando la lógica de negocio a los servicios de aplicación.
+-   **Desacoplamiento del ORM:** El dominio está completamente desacoplado del ORM de Django. Los servicios de aplicación interactúan con las abstracciones de los repositorios, no con los modelos de Django directamente.

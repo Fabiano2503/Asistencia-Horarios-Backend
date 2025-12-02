@@ -1,241 +1,140 @@
-# Módulo de Practicantes
+# Módulo: Gestión de Practicantes
 
-Este módulo gestiona la información de los practicantes y su historial de acciones.
+## 1. Descripción del Módulo
 
-## Módulo de Historial de Practicantes
+Este módulo se encarga de la gestión de la información de los practicantes, incluyendo sus datos personales, estado y estadísticas.
 
-Este módulo permite gestionar el historial de acciones realizadas por y sobre los practicantes, incluyendo advertencias, traslados y expulsiones.
+- **Responsabilidad principal:** CRUD de practicantes y exposición de estadísticas.
+- **Relación con otros módulos:** Es la base para otros módulos como `gestion` y `puntualidad` que necesitan acceder a la información de los practicantes.
+- **Arquitectura Hexagonal:**
+  - **Dominio:** Define la entidad `Practicante` con su lógica de negocio y el `PracticanteRepository` como puerto de salida para la persistencia.
+  - **Aplicación:** El `PracticanteService` orquesta las operaciones sobre los practicantes.
+  - **Infraestructura:** Proporciona la implementación concreta del repositorio con Django ORM, las vistas de DRF y los serializers.
 
-### Modelo de Datos
+## 2. Documentación de Endpoints
 
-#### Acción de Practicante
-```typescript
-{
-  "id": number,
-  "fecha": "ISO8601 datetime",
-  "practicante_id": number,
-  "tipo_accion": "advertencia" | "traslado" | "expulsion" | "otro",
-  "descripcion": string,
-  "usuario": string,
-  "detalles": object
-}
-```
+### `GET /api/practicantes/`
 
-#### Estadísticas de Historial
-```typescript
-{
-  "total_registros": number,
-  "total_advertencias": number,
-  "total_traslados": number,
-  "total_expulsiones": number,
-  "total_practicantes": number,
-  "total_activos": number,
-  "total_trasladados": number,
-  "total_expulsados": number,
-  "total_en_reforzamiento": number
-}
-```
-
-## Endpoints
-
-## Endpoints de Historial
-
-### Obtener Historial de Acciones
-
-- **GET /api/practicantes/historial/**
-- **Query Params:**
-  - `busqueda` (string): Texto para buscar en descripción o detalles
-  - `area` (string): Filtrar por área del practicante
-  - `tipo_accion` (string): Tipo de acción (advertencia, traslado, expulsion, otro)
-  - `estado` (string): Estado final del practicante (activo, en_recuperacion, en_riesgo, trasladado, expulsado)
-  - `fecha_desde` (date): Fecha de inicio (YYYY-MM-DD)
-  - `fecha_hasta` (date): Fecha de fin (YYYY-MM-DD)
-  - `pagina` (int): Número de página (default: 1)
-  - `por_pagina` (int): Elementos por página (default: 10)
-- **Respuesta Exitosa (200):**
+- **Método HTTP:** `GET`
+- **Descripción:** Lista todos los practicantes.
+- **Servicio de Aplicación:** `PracticanteService.get_all_practicantes`
+- **Ejemplo de Respuesta:**
   ```json
-  {
-    "data": [
-      {
-        "id": 1,
-        "fecha": "2023-01-01T12:00:00Z",
-        "practicante_id": 1,
-        "tipo_accion": "advertencia",
-        "descripcion": "Llegada tarde",
-        "usuario": "admin",
-        "detalles": {"motivo": "Retraso injustificado"}
-      }
-    ],
-    "paginacion": {
-      "total": 1,
-      "pagina": 1,
-      "por_pagina": 10,
-      "total_paginas": 1
+  [
+    {
+      "id": 1,
+      "id_discord": 12345,
+      "nombre": "Juan",
+      "apellido": "Pérez",
+      "correo": "juan.perez@example.com",
+      "semestre": 5,
+      "estado": "activo"
     }
-  }
+  ]
   ```
 
-### Obtener Estadísticas del Historial
+### `POST /api/practicantes/`
 
-- **GET /api/practicantes/historial/estadisticas/**
-- **Respuesta Exitosa (200):**
+- **Método HTTP:** `POST`
+- **Descripción:** Crea un nuevo practicante.
+- **Servicio de Aplicación:** `PracticanteService.create_practicante`
+- **Ejemplo de Request:**
   ```json
   {
-    "total_registros": 100,
-    "total_advertencias": 50,
-    "total_traslados": 20,
-    "total_expulsiones": 5,
-    "total_practicantes": 30,
-    "total_activos": 25,
-    "total_trasladados": 3,
-    "total_expulsados": 2,
-    "total_en_reforzamiento": 5
+    "id_discord": 12345,
+    "nombre": "Juan",
+    "apellido": "Pérez",
+    "correo": "juan.perez@example.com",
+    "semestre": 5,
+    "estado": "activo"
   }
   ```
+- **Ejemplo de Respuesta:** `201 Created` con el objeto del practicante creado.
 
-### Registrar Nueva Acción
+### `GET /api/practicantes/<int:pk>/`
 
-- **POST /api/practicantes/historial/acciones/**
-- **Body:**
-  ```json
-  {
-    "practicante_id": 1,
-    "tipo_accion": "advertencia",
-    "descripcion": "Llegada tarde",
-    "detalles": {
-      "motivo": "Retraso injustificado",
-      "gravedad": "media"
-    }
-  }
-  ```
-- **Respuesta Exitosa (201):**
+- **Método HTTP:** `GET`
+- **Descripción:** Obtiene un practicante por su ID.
+- **Servicio de Aplicación:** `PracticanteService.get_practicante_by_id`
+- **Ejemplo de Respuesta:**
   ```json
   {
     "id": 1,
-    "fecha": "2023-01-01T12:00:00Z",
-    "practicante_id": 1,
-    "tipo_accion": "advertencia",
-    "descripcion": "Llegada tarde",
-    "usuario": "admin",
-    "detalles": {"motivo": "Retraso injustificado"}
-  }
-  ```
-- **Códigos de Error:**
-  - 400: Datos de entrada inválidos o faltantes
-  - 500: Error interno del servidor
-
-## Endpoints de Gestión de Practicantes
-
-### Listar y Filtrar Practicantes
-
-- **GET /api/practicantes/**
-- **Query Params:**
-  - `nombre` (string): Filtra por nombre.
-  - `correo` (string): Filtra por correo electrónico.
-  - `estado` (string): Filtra por estado (`activo`, `en_recuperacion`, `en_riesgo`).
-- **Respuesta:**
-  ```json
-  {
-    "count": 100,
-    "next": "https://IP:PUERTO/api/practicantes/?page=2",
-    "previous": null,
-    "results": [
-      {
-        "id": 1,
-        "id_discord": 123456789012345678,
-        "nombre": "string",
-        "apellido": "string",
-        "correo": "user1@correo.com",
-        "semestre": 4,
-        "estado": "activo"
-      },
-      {
-        "id": 2,
-        "id_discord": 123456789012345679,
-        "nombre": "string",
-        "apellido": "string",
-        "correo": "user2@correo.com",
-        "semestre": 5,
-        "estado": "activo"
-      },
-      {
-        "id": 3,
-        "id_discord": 123456789012345670,
-        "nombre": "string",
-        "apellido": "string",
-        "correo": "user3@correo.com",
-        "semestre": 6,
-        "estado": "activo"
-      },
-      {
-        "id": 4,
-        "id_discord": 123456789012345671,
-        "nombre": "string",
-        "apellido": "string",
-        "correo": "user4@correo.com",
-        "semestre": 6,
-        "estado": "activo"
-      },
-      {
-        "id": 5,
-        "id_discord": 123456789012345672,
-        "nombre": "string",
-        "apellido": "string",
-        "correo": "user5@correo.com",
-        "semestre": 5,
-        "estado": "en_recuperacion"
-      },
-      {
-        "id": 6,
-        "id_discord": 123456789012345673,
-        "nombre": "string",
-        "apellido": "string",
-        "correo": "user6@correo.com",
-        "semestre": 4,
-        "estado": "activo"
-      }
-    ]
-  }
-  ```
-
-### Obtener Detalle de un Practicante
-
-- **GET /api/practicantes/{id}/**
-
-### Crear un Practicante
-
-- **POST /api/practicantes/**
-- **Body:**
-  ```json
-  {
-    "id_discord": 123456789012345678,
-    "nombre": "string",
-    "apellido": "string",
-    "correo": "user@correo.com",
-    "semestre": 4,
+    "id_discord": 12345,
+    "nombre": "Juan",
+    "apellido": "Pérez",
+    "correo": "juan.perez@example.com",
+    "semestre": 5,
     "estado": "activo"
   }
   ```
 
-### Actualizar un Practicante
+### `PUT /api/practicantes/<int:pk>/`
 
-- **PUT /api/practicantes/{id}/**
-- **PATCH /api/practicantes/{id}/**
-- **Body:** (similar al de creación)
-
-### Eliminar un Practicante
-
-- **DELETE /api/practicantes/{id}/**
-
-### Obtener Estadísticas
-
-- **GET /api/practicantes/estadisticas/**
-- **Respuesta:**
+- **Método HTTP:** `PUT`
+- **Descripción:** Actualiza un practicante existente.
+- **Servicio de Aplicación:** `PracticanteService.update_practicante`
+- **Ejemplo de Request:**
   ```json
   {
-    "total": 0,
-    "activos": 0,
-    "en_recuperacion": 0,
-    "en_riesgo": 0
+    "semestre": 6,
+    "estado": "en_recuperacion"
   }
   ```
+
+### `DELETE /api/practicantes/<int:pk>/`
+
+- **Método HTTP:** `DELETE`
+- **Descripción:** Elimina un practicante.
+- **Servicio de Aplicación:** `PracticanteService.delete_practicante`
+- **Respuesta:** `204 No Content`
+
+### `GET /api/practicantes/estadisticas/`
+
+- **Método HTTP:** `GET`
+- **Descripción:** Obtiene estadísticas sobre los practicantes.
+- **Servicio de Aplicación:** `PracticanteService.get_practicante_stats`
+- **Ejemplo de Respuesta:**
+  ```json
+  {
+    "total": 10,
+    "activos": 7,
+    "en_recuperacion": 2,
+    "en_riesgo": 1
+  }
+  ```
+
+### `GET /api/practicantes/advertencias/mes/`
+
+- **Descripción:** Obtiene las advertencias del mes actual.
+
+### `GET /api/practicantes/advertencias/historico/`
+
+- **Descripción:** Obtiene el histórico de advertencias.
+
+### `GET /api/practicantes/permisos/semana/`
+
+- **Descripción:** Obtiene los permisos de la semana actual.
+
+### `GET /api/practicantes/permisos/practicante/`
+
+- **Descripción:** Obtiene los permisos por practicante.
+
+### `GET /api/practicantes/exportar/semanal/`
+
+- **Descripción:** Exporta el reporte semanal en formato Excel.
+
+### `GET /api/practicantes/exportar/mensual/`
+
+- **Descripción:** Exporta el reporte mensual en formato Excel.
+
+## 4. Requisitos y Configuración
+
+- **Dependencias:** Django, djangorestframework.
+- **Migraciones:** Requiere que las migraciones del módulo se hayan ejecutado.
+
+## 5. Buenas Prácticas y Estándares
+
+- **Convenciones:** Sigue las convenciones de DRF con ViewSets para las operaciones CRUD.
+- **Extensibilidad:** Añadir nuevos endpoints se puede hacer a través de acciones personalizadas en el `PracticanteViewSet` o creando nuevas vistas de API. La lógica de negocio debe residir en el `PracticanteService`.
+- **Desacoplamiento:** El dominio está aislado del framework, permitiendo que la lógica de negocio se pruebe de forma independiente.
