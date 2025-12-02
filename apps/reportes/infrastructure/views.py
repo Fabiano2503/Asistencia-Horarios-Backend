@@ -1,96 +1,93 @@
+# apps/reportes/infrastructure/views.py
+
 from rest_framework.response import Response
-from django.http import FileResponse
-from . import serializers
+from django.http import HttpResponse
+import asyncio
+from io import BytesIO
+
 from apps.reportes.application.services import (
-    get_dashboard_summary,
-    get_advertencias_mes_actual,
-    get_historial_advertencias,
-    get_detalle_cumplimiento_horas,
-    get_resumen_global_horas,
-    get_permisos_semana_actual,
-    get_resumen_permisos_practicante,
+    obtener_resumen_dashboard,
+    obtener_advertencias_mes_actual,
+    obtener_advertencias_historico,
+    obtener_permisos_semana_actual,
+    obtener_permisos_por_practicante,
+    obtener_resumen_global_horas,
+    obtener_detalle_cumplimiento_horas,
     generar_reporte_semanal_excel,
     generar_reporte_mensual_excel,
 )
 
-import io
-import asyncio
-
-
-# ----------- HELPERS PARA LLAMAR FUNCIONES ASYNC DESDE DJANGO -----------
-
+# -----------------------------
+# Helper para ejecutar funciones async
+# -----------------------------
 def run_async(func, *args, **kwargs):
-    """Ejecuta funciones async dentro de Django (sync)."""
     return asyncio.run(func(*args, **kwargs))
 
 
-# ---------------------- VIEWS ----------------------
+# -----------------------------
+# ENDPOINTS DE API
+# -----------------------------
 
 def dashboard_summary(request):
-    data = run_async(get_dashboard_summary)
-    serialized = serializers.dashboard_summary_to_dict(
-        type("Obj", (), data)
-    )
-   return Response(data)
-
-
-def advertencias_mes_actual(request):
-    data = run_async(get_advertencias_mes_actual)
+    data = obtener_resumen_dashboard()
     return Response(data)
 
 
-
-def historial_advertencias(request):
-    page = int(request.GET.get("page", 1))
-    size = int(request.GET.get("size", 20))
-    data = run_async(get_historial_advertencias, page, size)
-   return Response(data)
+def advertencias_mes_actual(request):
+    data = obtener_advertencias_mes_actual()
+    return Response(data)
 
 
-def detalle_cumplimiento_horas(request):
-    data = run_async(get_detalle_cumplimiento_horas)
-    return JsonResponse(data, safe=False)
-
-
-def resumen_global_horas(request):
-    data = run_async(get_resumen_global_horas)
+def advertencias_historico(request):
+    data = obtener_advertencias_historico()
     return Response(data)
 
 
 def permisos_semana_actual(request):
-    data = run_async(get_permisos_semana_actual)
-   return Response(data)
-
-
-def resumen_permisos_practicante(request):
-    data = run_async(get_resumen_permisos_practicante)
+    data = obtener_permisos_semana_actual()
     return Response(data)
 
 
+def permisos_por_practicante(request):
+    data = obtener_permisos_por_practicante()
+    return Response(data)
 
-# ---------------------- EXPORTAR EXCEL ----------------------
+
+def resumen_global_horas(request):
+    data = obtener_resumen_global_horas()
+    return Response(data)
+
+
+def detalle_cumplimiento_horas(request):
+    data = obtener_detalle_cumplimiento_horas()
+    return Response(data)
+
+
+# -----------------------------
+# EXPORTACIONES EXCEL
+# -----------------------------
 
 def export_reporte_semanal(request):
-    buffer = io.BytesIO()
+    buffer = BytesIO()
     run_async(generar_reporte_semanal_excel, buffer)
-    buffer.seek(0)
 
-    return FileResponse(
-        buffer,
-        as_attachment=True,
-        filename="Reporte_Semanal.xlsx",
-        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    buffer.seek(0)
+    response = HttpResponse(
+        buffer.read(),
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
+    response["Content-Disposition"] = 'attachment; filename="reporte_semanal.xlsx"'
+    return response
 
 
 def export_reporte_mensual(request):
-    buffer = io.BytesIO()
+    buffer = BytesIO()
     run_async(generar_reporte_mensual_excel, buffer)
-    buffer.seek(0)
 
-    return FileResponse(
-        buffer,
-        as_attachment=True,
-        filename="Reporte_Mensual.xlsx",
-        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    buffer.seek(0)
+    response = HttpResponse(
+        buffer.read(),
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
+    response["Content-Disposition"] = 'attachment; filename="reporte_mensual.xlsx"'
+    return response
