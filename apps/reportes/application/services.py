@@ -1,6 +1,5 @@
 # app/application/services.py
 
-import asyncpg
 from datetime import datetime, date
 import os
 from dotenv import load_dotenv
