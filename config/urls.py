@@ -1,32 +1,16 @@
-"""
-URL configuration for config project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    # Rutas correctas según la estructura del proyecto
     path('api/practicantes/', include('apps.practicantes.infrastructure.urls')),
     path('api/bot/', include('apps.bot_discord.infrastructure.urls')),
-    
-    # Conflicto resuelto: Incluyendo ambas ramas de la fusión
+
+    # Rutas de gestion-horario
     path('api/v1/', include('apps.gestion.infrastructure.urls')),
-    path('api/puntualidad/', include('apps.puntualidad.infrastructure.urls')), 
-    # NOTA: Cambié 'apps.puntualidad.urls' a 'apps.puntualidad.infrastructure.urls'
-    # asumiendo que sigues la estructura del proyecto (como en practicantes y bot_discord).
+    path('api/puntualidad/', include('apps.puntualidad.infrastructure.urls')),
+
+    # Rutas de reportes (rama main)
+    path("api/reportes/", include(("apps.reportes.infrastructure.urls", "reportes"), namespace="reportes")),
 ]
