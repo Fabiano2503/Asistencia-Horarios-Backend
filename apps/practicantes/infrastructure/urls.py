@@ -11,4 +11,7 @@ urlpatterns = [
     path("permisos/practicante/", views.permisos_por_practicante, name="permissions-employee"),
     path("exportar/semanal/", views.export_reporte_semanal, name="export-weekly"),
     path("exportar/mensual/", views.export_reporte_mensual, name="export-monthly"),
+    path("cumplimiento/detalle/", views.detalle_cumplimiento_horas, name="compliance-detail"),
+    path("resumen/global/", views.resumen_global_horas, name="global-summary"),
+    
 ]
