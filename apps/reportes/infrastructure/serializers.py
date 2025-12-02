@@ -1,54 +1,79 @@
-# app/infrastructure/serializers.py
+# apps/reportes/infrastructure/serializers.py
 
-from datetime import date, datetime
-from typing import Optional
+from datetime import date
 
-class PracticanteBase(BaseModel):
-    id: int
-    nombre: str
-    apellido: str
-    correo: str
-    semestre: int
+def practicante_to_dict(p):
+    if p is None:
+        return None
 
-class AdvertenciaMesActual(BaseModel):
-    practicante: PracticanteBase
-    cantidad_advertencias: int
+    return {
+        "id": p.id,
+        "nombre": p.nombre,
+        "apellido": p.apellido,
+        "correo": p.correo,
+        "semestre": p.semestre,
+    }
 
-class HistorialAdvertencia(BaseModel):
-    practicante: PracticanteBase
-    fecha: date
-    motivo: str
-    tipo: str  # unjustified-absence, unanswered-call, etc.
 
-class DetalleCumplimientoHoras(BaseModel):
-    practicante: PracticanteBase
-    horas_semanales: float = 0.0
-    proyeccion_mensual: float = 0.0
-    porcentaje_meta: float = 0.0
-    estado: str  # "critical", "warning", "ok"
+def advertencia_mes_actual_to_dict(item):
+    return {
+        "practicante": practicante_to_dict(item.practicante),
+        "cantidad_advertencias": item.cantidad_advertencias,
+    }
 
-class ResumenGlobalHoras(BaseModel):
-    total_horas_trabajadas: float
-    meta_semanal_total: int = 240
-    porcentaje_cumplimiento: float
-    practicantes_cumpliendo: int
-    practicantes_criticos: int
-    total_practicantes: int
 
-class PermisoSemana(BaseModel):
-    id: int
-    practicante: PracticanteBase
-    fecha_solicitud: date
-    motivo: str
-    estado: str  # Aprobado / Pendiente / Rechazado
+def historial_advertencia_to_dict(item):
+    return {
+        "practicante": practicante_to_dict(item.practicante),
+        "fecha": item.fecha,
+        "motivo": item.motivo,
+        "tipo": item.tipo,
+    }
 
-class ResumenPermisosPracticante(BaseModel):
-    practicante: PracticanteBase
-    aprobados: int
-    total_solicitados: int
 
-class DashboardSummary(BaseModel):
-    total_horas: float
-    meta_semanal: int = 240
-    cumplimiento_porcentaje: float
-    horas_faltantes: float
+def detalle_cumplimiento_horas_to_dict(item):
+    return {
+        "practicante": practicante_to_dict(item.practicante),
+        "horas_semanales": item.horas_semanales,
+        "proyeccion_mensual": item.proyeccion_mensual,
+        "porcentaje_meta": item.porcentaje_meta,
+        "estado": item.estado,
+    }
+
+
+def resumen_global_horas_to_dict(data):
+    return {
+        "total_horas_trabajadas": data.total_horas_trabajadas,
+        "meta_semanal_total": 240,
+        "porcentaje_cumplimiento": data.porcentaje_cumplimiento,
+        "practicantes_cumpliendo": data.practicantes_cumpliendo,
+        "practicantes_criticos": data.practicantes_criticos,
+        "total_practicantes": data.total_practicantes,
+    }
+
+
+def permiso_semana_to_dict(p):
+    return {
+        "id": p.id,
+        "practicante": practicante_to_dict(p.practicante),
+        "fecha_solicitud": p.fecha_solicitud,
+        "motivo": p.motivo,
+        "estado": p.estado,
+    }
+
+
+def resumen_permisos_practicante_to_dict(item):
+    return {
+        "practicante": practicante_to_dict(item.practicante),
+        "aprobados": item.aprobados,
+        "total_solicitados": item.total_solicitados,
+    }
+
+
+def dashboard_summary_to_dict(item):
+    return {
+        "total_horas": item.total_horas,
+        "meta_semanal": 240,
+        "cumplimiento_porcentaje": item.cumplimiento_porcentaje,
+        "horas_faltantes": item.horas_faltantes,
+    }
