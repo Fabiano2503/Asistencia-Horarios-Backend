@@ -1,9 +1,9 @@
-# practicantes/tests.py
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-
+# Importación corregida para el SmokeTest
+from apps.practicantes.infrastructure import views 
 
 
 class ReportesAPITests(APITestCase):
@@ -70,6 +70,7 @@ class ReportesAPITests(APITestCase):
         url = reverse("practicantes:export-monthly")
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Aquí se usa 'Content-Disposition' con 'D' mayúscula
         self.assertTrue(response.headers["Content-Disposition"].startswith("attachment; filename=reporte_mensual"))
 
 
@@ -78,16 +79,18 @@ class SmokeTest(TestCase):
     def test_import_views(self):
         """Asegura que todos los views se importan sin errores"""
         try:
-            from practicantes.views import (
-                dashboard_summary,
-                advertencias_mes_actual,
-                advertencias_historico,
-                detalle_cumplimiento_horas,
-                resumen_global_horas,
-                permisos_semana_actual,
-                permisos_por_practicante,
-                export_reporte_semanal,
-                export_reporte_mensual,
+            # Importación corregida: usamos 'views' como alias y accedemos a las funciones
+            # El error es que 'practicantes.views' no existe, la ruta correcta es 'apps.practicantes.infrastructure.views'
+            _ = (
+                views.dashboard_summary,
+                views.advertencias_mes_actual,
+                views.advertencias_historico,
+                views.detalle_cumplimiento_horas,
+                views.resumen_global_horas,
+                views.permisos_semana_actual,
+                views.permisos_por_practicante,
+                views.export_reporte_semanal,
+                views.export_reporte_mensual,
             )
             self.assertTrue(True)
         except ImportError as e:
