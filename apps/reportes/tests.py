@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 # RUTA CORRECTA A TUS VIEWS (ajustá si tu carpeta se llama "reportes" o "Reportes")
-from apps.Reportes.infrastructure import views
+from apps.reportes.infrastructure import views
 
 
 class ReportesAPITests(APITestCase):
