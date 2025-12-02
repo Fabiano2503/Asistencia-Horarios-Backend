@@ -8,6 +8,7 @@ urlpatterns = [
     path('api/practicantes/', include('apps.practicantes.infrastructure.urls')),
     path('api/bot/', include('apps.bot_discord.infrastructure.urls')),
 
-    # Nueva app reportes
-    path('api/v1/reports/', include('apps.reporte.infrastructure.urls', namespace='reporte')),
+    # Nueva app reportespath("api/v1/reports/", include("apps.reporte.infrastructure.urls")),
+    path("api/v1/reports/", include("apps.reporte.infrastructure.urls")),
+
 ]
