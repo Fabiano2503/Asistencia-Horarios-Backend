@@ -2,15 +2,25 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from .serializers import PracticanteSerializer, EstadisticasSerializer
+# Importa otros serializers si son necesarios para las advertencias
+# from .serializers import AdvertenciaSerializer # <--- Descomentar si usas un serializer específico
+
 from ..application.services import PracticanteService
 from .django_orm_repository import DjangoPracticanteRepository
 
 # ViewSet para gestionar las operaciones CRUD y estadísticas de practicantes
 class PracticanteViewSet(viewsets.GenericViewSet):
+    """
+    ViewSet para manejar las operaciones CRUD y acciones personalizadas
+    relacionadas con el modelo Practicante.
+    """
     serializer_class = PracticanteSerializer
 
     def get_service(self) -> PracticanteService:
+        """Devuelve una instancia del servicio de aplicación."""
         return PracticanteService(DjangoPracticanteRepository())
+
+    # --- Operaciones CRUD (Heredadas de GenericViewSet) ---
 
     # Listado con filtros y paginación
     def list(self, request, *args, **kwargs):
@@ -47,9 +57,11 @@ class PracticanteViewSet(viewsets.GenericViewSet):
         serializer = self.get_serializer(practicante)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    # Actualizar un practicante
+    # Actualizar un practicante (PUT)
     def update(self, request, pk=None):
         service = self.get_service()
+        # Nota: La validación del serializer debe hacerse con el objeto existente si no estás usando 'instance'
+        # Pero mantendremos tu flujo actual por simplicidad, asumiendo que el Service maneja la instancia.
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         practicante = service.update_practicante(pk, serializer.validated_data)
@@ -75,10 +87,31 @@ class PracticanteViewSet(viewsets.GenericViewSet):
         service.delete_practicante(pk)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    # Acción personalizada para estadísticas
+    # --- Acciones Personalizadas (@action) ---
+    
+    # Acción para obtener estadísticas generales (ya la tenías)
     @action(detail=False, methods=['get'])
     def estadisticas(self, request):
         service = self.get_service()
         stats = service.get_practicante_stats()
         serializer = EstadisticasSerializer(stats)
         return Response(serializer.data)
+
+    # SOLUCIÓN AL BUG: Implementación de la función faltante
+    # URL generada por el router: /api/practicantes/advertencias_mes_actual/
+    @action(detail=False, methods=['get'])
+    def advertencias_mes_actual(self, request):
+        """
+        Obtiene el listado de advertencias para todos los practicantes 
+        en el mes actual.
+        """
+        service = self.get_service()
+        
+        # ⚠️ Necesitarás crear este método en PracticanteService
+        advertencias = service.get_advertencias_mes_actual() 
+        
+        # ⚠️ Usa un serializer apropiado para las advertencias si es necesario
+        # serializer = AdvertenciaSerializer(advertencias, many=True) 
+        
+        # Si el Service devuelve la data ya lista (ej. un diccionario o lista simple):
+        return Response(advertencias, status=status.HTTP_200_OK)
