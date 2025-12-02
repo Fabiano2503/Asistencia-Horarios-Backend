@@ -19,16 +19,18 @@ import asyncio
 # ----------- HELPERS PARA LLAMAR FUNCIONES ASYNC DESDE DJANGO -----------
 
 def run_async(func, *args, **kwargs):
-    """Ejecuta funciones async dentro de Django (que es sync)."""
+    """Ejecuta funciones async dentro de Django (sync)."""
     return asyncio.run(func(*args, **kwargs))
 
 
-# ---------------------- VIEWS DJANGO ---------------------- #
+# ---------------------- VIEWS ----------------------
 
 def dashboard_summary(request):
     data = run_async(get_dashboard_summary)
-    serialized = serializers.DashboardSummary(**data)
-    return JsonResponse(serialized.dict(), safe=False)
+    serialized = serializers.dashboard_summary_to_dict(
+        type("Obj", (), data)
+    )
+    return JsonResponse(serialized, safe=False)
 
 
 def advertencias_mes_actual(request):
@@ -63,7 +65,7 @@ def resumen_permisos_practicante(request):
     return JsonResponse(data, safe=False)
 
 
-# ---------------------- EXPORTAR EXCEL ---------------------- #
+# ---------------------- EXPORTAR EXCEL ----------------------
 
 def export_reporte_semanal(request):
     buffer = io.BytesIO()
