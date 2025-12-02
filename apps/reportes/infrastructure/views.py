@@ -1,4 +1,4 @@
-from django.http import JsonResponse, FileResponse
+from rest_framework.response import Response
 from . import serializers
 from apps.reportes.application.services import (
     get_dashboard_summary,
