@@ -15,7 +15,6 @@ from apps.reportes.application.services import (
     generar_reporte_mensual_excel,
 )
 
-
 def run_async(func, *args, **kwargs):
     return asyncio.run(func(*args, **kwargs))
 
