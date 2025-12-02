@@ -1,5 +1,5 @@
 from django.urls import path
-from .infrastructure.views import (
+from .views import (
     resumen_puntualidad, 
     alertas_puntualidad, 
     practicantes_puntualidad,

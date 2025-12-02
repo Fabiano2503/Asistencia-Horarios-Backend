@@ -7,7 +7,10 @@ urlpatterns = [
     path('api/practicantes/', include('apps.practicantes.infrastructure.urls')),
     path('api/bot/', include('apps.bot_discord.infrastructure.urls')),
 
-    # Rutas de reportes (carpeta apps/reportes)
-    path("api/reportes/", include(("apps.reportes.infrastructure.urls", "reportes"), namespace="reportes")),
+    # Rutas de gestion-horario
+    path('api/v1/', include('apps.gestion.infrastructure.urls')),
+    path('api/puntualidad/', include('apps.puntualidad.infrastructure.urls')),
 
+    # Rutas de reportes (rama main)
+    path("api/reportes/", include(("apps.reportes.infrastructure.urls", "reportes"), namespace="reportes")),
 ]
