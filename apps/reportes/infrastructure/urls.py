@@ -2,7 +2,8 @@ from django.urls import path
 from . import views
 
 
-app_name = "practicantes"
+app_name = "reportes"
+
 
 urlpatterns = [
     path("summary", views.dashboard_summary, name="summary"),
