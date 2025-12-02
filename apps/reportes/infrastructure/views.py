@@ -30,19 +30,20 @@ def dashboard_summary(request):
     serialized = serializers.dashboard_summary_to_dict(
         type("Obj", (), data)
     )
-    return JsonResponse(serialized, safe=False)
+   return Response(data)
 
 
 def advertencias_mes_actual(request):
     data = run_async(get_advertencias_mes_actual)
-    return JsonResponse(data, safe=False)
+    return Response(data)
+
 
 
 def historial_advertencias(request):
     page = int(request.GET.get("page", 1))
     size = int(request.GET.get("size", 20))
     data = run_async(get_historial_advertencias, page, size)
-    return JsonResponse(data, safe=False)
+   return Response(data)
 
 
 def detalle_cumplimiento_horas(request):
@@ -52,17 +53,18 @@ def detalle_cumplimiento_horas(request):
 
 def resumen_global_horas(request):
     data = run_async(get_resumen_global_horas)
-    return JsonResponse(data, safe=False)
+    return Response(data)
 
 
 def permisos_semana_actual(request):
     data = run_async(get_permisos_semana_actual)
-    return JsonResponse(data, safe=False)
+   return Response(data)
 
 
 def resumen_permisos_practicante(request):
     data = run_async(get_resumen_permisos_practicante)
-    return JsonResponse(data, safe=False)
+    return Response(data)
+
 
 
 # ---------------------- EXPORTAR EXCEL ----------------------
