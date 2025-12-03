@@ -1,9 +1,17 @@
 from django.urls import path
+from django.urls import include
+from rest_framework.routers import DefaultRouter
 from . import views
+from .views import PracticanteViewSet
 
 app_name = "practicantes"
 
+router = DefaultRouter()
+router.register(r'', PracticanteViewSet, basename='practicante')
+
 urlpatterns = [
+    path('', include(router.urls)),
+    
     # Estas líneas ahora encuentran las funciones definidas en views.py
     path("advertencias/mes/", views.advertencias_mes_actual, name="warnings-current"),
     path("advertencias/historico/", views.advertencias_historico, name="warnings-history"),
@@ -13,5 +21,4 @@ urlpatterns = [
     path("exportar/mensual/", views.export_reporte_mensual, name="export-monthly"),
     path("cumplimiento/detalle/", views.detalle_cumplimiento_horas, name="compliance-detail"),
     path("resumen/global/", views.resumen_global_horas, name="global-summary"),
-    
 ]

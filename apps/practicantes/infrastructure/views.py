@@ -13,27 +13,70 @@ class PracticanteViewSet(viewsets.GenericViewSet):
     serializer_class = PracticanteSerializer
 
     def get_service(self) -> PracticanteService:
-        # Usa el servicio con el repositorio ORM de Django
         return PracticanteService(DjangoPracticanteRepository())
 
     # Listado con filtros y paginación
     def list(self, request, *args, **kwargs):
         service = self.get_service()
-        # Nota: Aquí debería ir la lógica para tomar parámetros de filtro (nombre, correo, estado) 
-        # desde request.query_params
-        practicantes = service.filter_practicantes(None, None, None) # Placeholder
+        nombre = request.query_params.get('nombre')
+        correo = request.query_params.get('correo')
+        estado = request.query_params.get('estado')
+
+        practicantes = service.filter_practicantes(nombre, correo, estado)
+
+        page = self.paginate_queryset(practicantes)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
         serializer = self.get_serializer(practicantes, many=True)
         return Response(serializer.data)
 
-    # --- Funciones CRUD Faltantes (Deben ser implementadas aquí en el ViewSet) ---
-    # Ejemplo de create:
-    # def create(self, request):
-    #     service = self.get_service()
-    #     practicante = service.create_practicante(request.data)
-    #     serializer = self.get_serializer(practicante)
-    #     return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
-    # ... (Asegúrate de que retrieve, create, update, destroy también estén en el ViewSet) ...
+    # Obtener un solo practicante
+    def retrieve(self, request, pk=None):
+        service = self.get_service()
+        practicante = service.get_practicante_by_id(pk)
+        if not practicante:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = self.get_serializer(practicante)
+        return Response(serializer.data)
+
+    # Crear un practicante
+    def create(self, request):
+        service = self.get_service()
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        practicante = service.create_practicante(serializer.validated_data)
+        serializer = self.get_serializer(practicante)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    # Actualizar un practicante
+    def update(self, request, pk=None):
+        service = self.get_service()
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        practicante = service.update_practicante(pk, serializer.validated_data)
+        if not practicante:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = self.get_serializer(practicante)
+        return Response(serializer.data)
+
+    # Actualización parcial (PATCH)
+    def partial_update(self, request, pk=None):
+        service = self.get_service()
+        serializer = self.get_serializer(data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        practicante = service.update_practicante(pk, serializer.validated_data)
+        if not practicante:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = self.get_serializer(practicante)
+        return Response(serializer.data)
+
+    # Eliminar un practicante
+    def destroy(self, request, pk=None):
+        service = self.get_service()
+        service.delete_practicante(pk)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     # Acción personalizada para estadísticas
     @action(detail=False, methods=['get'])
